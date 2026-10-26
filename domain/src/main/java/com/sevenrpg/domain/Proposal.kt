@@ -14,14 +14,15 @@ data class Proposal(
     val callId: String? = null
 ) {
     fun toMap(): Map<String, Any> {
-        return mapOf(
+        val result = linkedMapOf<String, Any>(
             "type" to type,
             "prose" to prose,
             "events" to events,
             "attemptsUnauthorizedMutation" to attemptsUnauthorizedMutation,
             "revisionBase" to revisionBase,
-            "provider" to provider,
-            "callId" to callId
+            "provider" to provider
         )
+        callId?.let { result["callId"] = it }
+        return result
     }
 }
