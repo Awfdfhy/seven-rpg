@@ -49,7 +49,7 @@ data class DomainEvent(
                 revisionBase = data["revisionBase"] as Int,
                 authorized = data["authorized"] as? Boolean ?: true,
                 payload = data["payload"] as? Map<String, Any> ?: emptyMap(),
-                timestamp = Instant.parse(data["timestamp"] as String)
+                timestamp = (data["timestamp"] as? String)?.let { runCatching { Instant.parse(it) }.getOrNull() } ?: Instant.EPOCH
             )
         }
     }
