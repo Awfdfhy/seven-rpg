@@ -1,10 +1,10 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), SAVE_KEY='seven_rpg_browser_save_v1', CONFIG_KEY='seven_rpg_browser_ai_v1';
-let state=null,busy=false;
+let state=null,busy=false,lastSavedState=null;
 const safe=(v,max=2000)=>String(v??'').slice(0,max);
 function status(id,msg,kind=''){const el=$(id);el.textContent=msg;el.className='status '+kind}
 function render(){if(!state)return;ensureSystems(state);$('setupPanel').classList.add('hidden');$('gamePanel').classList.remove('hidden');$('worldPill').textContent=state.world.name;$('characterInfo').textContent=state.player.name+' · '+state.player.className+' · '+state.difficulty+' · المراجعة '+state.revision;$('revisionPill').textContent='المراجعة '+state.revision;$('narrative').textContent=state.narrative;$('setupStatus').textContent='تم تحميل الحملة.';renderSystems()}
-function persist(){if(!state)return false;try{state.updatedAt=new Date().toISOString();localStorage.setItem(SAVE_KEY,JSON.stringify(state));return true}catch(e){status('gameStatus','فشل الحفظ المحلي: '+e.message,'error');return false}}
+function persist(){if(!state)return false;try{state.updatedAt=new Date().toISOString();localStorage.setItem(SAVE_KEY,JSON.stringify(state));lastSavedState=JSON.parse(JSON.stringify(state));return true}catch(e){status('gameStatus','فشل الحفظ المحلي: '+e.message,'error');return false}}
 function validState(s){if(!s||s.schema!==1||!s.world||!s.player)return false;const w=s.world,p=s.player;return typeof w.id==='string'&&w.id.length>0&&typeof w.name==='string'&&w.name.trim().length>0&&w.name.length<=30&&typeof w.lore==='string'&&w.lore.length<=1500&&w.canonFacts&&typeof w.canonFacts==='object'&&!Array.isArray(w.canonFacts)&&typeof p.id==='string'&&p.id.length>0&&typeof p.name==='string'&&p.name.trim().length>0&&p.name.length<=20&&['warrior','mage','rogue'].includes(p.className)&&p.attributes&&typeof p.attributes==='object'&&['strength','agility','intelligence'].every(k=>Number.isFinite(p.attributes[k]))&&['سهلة','متوسطة','صعبة'].includes(s.difficulty)&&Number.isInteger(s.revision)&&s.revision>=1&&typeof s.narrative==='string'&&s.narrative.length<=2000&&Array.isArray(s.events)&&s.events.every(e=>e&&typeof e.id==='string'&&typeof e.action==='string'&&e.action.length<=200&&typeof e.description==='string'&&Number.isInteger(e.revisionBase)&&typeof e.authorized==='boolean')&&typeof s.createdAt==='string'}
 function cleanText(v,max=300){return String(v??'').slice(0,max)}
 function cleanNumber(v,min=0,max=1000000,fallback=0){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,Math.floor(n))):fallback}
@@ -59,7 +59,7 @@ function systemEvent(action,description){
   const achievements=[['first-event','خطوتك الأولى',state.events.length>=1],['first-victory','أول انتصار',action==='هجوم'&&description.includes('انتصرت')],['quest-complete','صائد المهام',action==='إكمال مهمة'],['explorer','رحّالة',state.systems.map.visited.length>=4]];
   for(const [id,title,earned] of achievements)if(earned&&!state.systems.achievements.entries.some(a=>a.id===id))state.systems.achievements.entries.push({id,title,at:new Date().toISOString()});
   state.revision++;state.narrative=description;
-  if(!persist()){state=previous;return false}
+  if(!persist()){state=lastSavedState?JSON.parse(JSON.stringify(lastSavedState)):previous;render();return false}
   render();status('gameStatus',description,'ok');return true;
 }
 function rankFor(rep){return rep>=60?'حليف':rep>=25?'صديق':rep<=-40?'عدو':rep<=-15?'مريب':'غريب'}
