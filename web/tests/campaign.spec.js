@@ -6,6 +6,13 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
 });
 
+async function createCampaign(page, world = 'ممالك الرماد', hero = 'ليان') {
+  await page.getByLabel('اسم العالم').fill(world);
+  await page.getByLabel('اسم الشخصية').fill(hero);
+  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+  await expect(page.locator('#gamePanel')).toBeVisible();
+}
+
 test('campaign creation persists after reload and restores the same world and hero', async ({ page }) => {
   await page.getByLabel('اسم العالم').fill('ممالك الرماد');
   await page.getByLabel('قانون العالم / خلفيته').fill('السحر نادر، ولا يمكن إعادة الموتى.');
@@ -26,7 +33,20 @@ test('campaign creation persists after reload and restores the same world and he
   expect(after.player.id).toBe(before.player.id);
 });
 
-test('AI action uses a real API-shaped request, validates result, and persists accepted event', async ({ page }) => {
+test('required fields are validated and all character classes/difficulties are selectable', async ({ page }) => {
+  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+  await expect(page.locator('#setupStatus')).toContainText('أدخل اسم عالم');
+  await page.getByLabel('اسم العالم').fill('عالم');
+  await page.getByLabel('اسم الشخصية').fill('بطل');
+  await page.getByLabel('الفئة').selectOption('mage');
+  await page.getByLabel('الصعوبة').selectOption('صعبة');
+  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.player.className).toBe('mage');
+  expect(saved.difficulty).toBe('صعبة');
+});
+
+test('AI action sends the expected request and persists an accepted event across reload', async ({ page }) => {
   await page.route('https://openrouter.ai/api/v1/chat/completions', async route => {
     const request = route.request();
     const body = request.postDataJSON();
@@ -41,9 +61,7 @@ test('AI action uses a real API-shaped request, validates result, and persists a
     });
   });
 
-  await page.getByLabel('اسم العالم').fill('مدينة الليل');
-  await page.getByLabel('اسم الشخصية').fill('ساهر');
-  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+  await createCampaign(page, 'مدينة الليل', 'ساهر');
   await page.getByLabel(/مفتاح API/).fill('test-session-key');
   await page.getByLabel(/ما الذي تريد فعله/).fill('افتح البوابة');
   await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
@@ -57,32 +75,134 @@ test('AI action uses a real API-shaped request, validates result, and persists a
   await expect(page.getByText(/تدور البوابة ببطء/)).toBeVisible();
 });
 
+test('AI connection test reports success for a valid provider response', async ({ page }) => {
+  await page.route('https://openrouter.ai/api/v1/chat/completions', async route => {
+    const body = route.request().postDataJSON();
+    expect(body.messages[1].content).toContain('اختبار اتصال فقط');
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ choices: [{ message: { content: 'متصل' } }] })
+    });
+  });
+  await page.getByLabel(/مفتاح API/).fill('test-session-key');
+  await page.getByRole('button', { name: 'اختبار اتصال حقيقي' }).click();
+  await expect(page.locator('#aiStatus')).toContainText('نجح الاتصال الحقيقي: متصل');
+});
+
 test('AI failure does not mutate campaign state', async ({ page }) => {
   await page.route('https://openrouter.ai/api/v1/chat/completions', route =>
     route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: { message: 'bad credentials' } }) })
   );
-  await page.getByLabel('اسم العالم').fill('العالم');
-  await page.getByLabel('اسم الشخصية').fill('البطل');
-  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+  await createCampaign(page, 'العالم', 'البطل');
   await page.getByLabel(/مفتاح API/).fill('bad-key');
   await page.getByLabel(/ما الذي تريد فعله/).fill('اقفز فوق الجدار');
   await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
-  await expect(page.getByRole('status').filter({ hasText: /لم تتغير الحملة: HTTP 401/ })).toBeVisible();
+  await expect(page.locator('#gameStatus')).toContainText('لم تتغير الحملة: HTTP 401');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
   expect(saved.revision).toBe(1);
   expect(saved.events).toHaveLength(0);
 });
 
-test('import rejects malformed saves without replacing the active campaign', async ({ page }) => {
-  await page.getByLabel('اسم العالم').fill('الحملة الأصلية');
-  await page.getByLabel('اسم الشخصية').fill('بطل');
-  await page.getByRole('button', { name: 'إنشاء / بدء الحملة' }).click();
+test('missing API key and empty action are rejected without changing state', async ({ page }) => {
+  await createCampaign(page);
+  await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('اكتب فعلاً');
+  await page.getByLabel(/ما الذي تريد فعله/).fill('حاول فتح الباب');
+  await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('أدخل مفتاح API');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.revision).toBe(1);
+  expect(saved.events).toHaveLength(0);
+});
+
+test('invalid endpoint is rejected and API key is never persisted', async ({ page }) => {
+  await page.getByLabel('عنوان API الكامل').fill('http://insecure.example/api');
+  await page.getByLabel(/مفتاح API/).fill('secret-session-key');
+  await page.getByRole('button', { name: 'حفظ إعدادات غير سرية' }).click();
+  await expect(page.locator('#aiStatus')).toContainText('عنوان HTTPS صالح');
+  expect(await page.evaluate(() => localStorage.getItem('seven_rpg_browser_ai_v1'))).toBeNull();
+
+  await page.getByLabel('عنوان API الكامل').fill('https://openrouter.ai/api/v1/chat/completions');
+  await page.getByRole('button', { name: 'حفظ إعدادات غير سرية' }).click();
+  await expect(page.locator('#aiStatus')).toContainText('حُفظ العنوان واسم النموذج فقط');
+  expect(await page.evaluate(() => localStorage.getItem('seven_rpg_browser_ai_v1'))).not.toContain('secret-session-key');
+  await page.reload();
+  await expect(page.getByLabel('اسم النموذج')).toHaveValue('openai/gpt-4.1-mini');
+  await expect(page.getByLabel(/مفتاح API/)).toHaveValue('');
+});
+
+test('valid JSON import replaces the active save and survives reload', async ({ page }) => {
+  await createCampaign(page, 'العالم الأصلي', 'الأول');
+  const incoming = {
+    schema: 1,
+    world: { id: 'world-imported', name: 'العالم المستورد', lore: 'قانون مستورد', canonFacts: {} },
+    player: { id: 'hero-imported', name: 'البطلة المستوردة', className: 'mage', attributes: { strength: 12, agility: 10, intelligence: 8 } },
+    difficulty: 'سهلة', revision: 4, events: [], narrative: 'وصلت البطلة إلى المدينة.', createdAt: '2026-01-01T00:00:00.000Z'
+  };
+  await page.locator('#importInput').setInputFiles({
+    name: 'save.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(incoming))
+  });
+  await expect(page.locator('#gameStatus')).toContainText('تم استيراد الحفظ');
+  await expect(page.locator('#worldPill')).toHaveText('العالم المستورد');
+  await page.reload();
+  await expect(page.locator('#worldPill')).toHaveText('العالم المستورد');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.world.id).toBe('world-imported');
+  expect(saved.revision).toBe(4);
+});
+
+test('malformed import does not replace the active campaign', async ({ page }) => {
+  await createCampaign(page, 'الحملة الأصلية', 'بطل');
   const originalId = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')).world.id);
   await page.locator('#importInput').setInputFiles({
     name: 'bad.json', mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify({ schema: 1, world: {}, player: {}, revision: -3, narrative: 12 }))
   });
-  await expect(page.getByRole('status').filter({ hasText: /فشل الاستيراد/ })).toBeVisible();
+  await expect(page.locator('#gameStatus')).toContainText('فشل الاستيراد');
   const after = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
   expect(after.world.id).toBe(originalId);
+});
+
+test('export produces a JSON download containing the active campaign', async ({ page }) => {
+  await createCampaign(page, 'عالم التصدير', 'مصدّر');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'تصدير الحفظ JSON' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('seven-rpg-save.json');
+  const path = await download.path();
+  const fs = require('node:fs');
+  const exported = JSON.parse(fs.readFileSync(path, 'utf8'));
+  expect(exported.world.name).toBe('عالم التصدير');
+  expect(exported.player.name).toBe('مصدّر');
+});
+
+test('starting a new world can be cancelled without hiding the active campaign', async ({ page }) => {
+  await createCampaign(page, 'عالم مستمر', 'البطل');
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'عالم جديد' }).click();
+  await expect(page.locator('#gamePanel')).toBeVisible();
+  await expect(page.locator('#worldPill')).toHaveText('عالم مستمر');
+});
+
+test('unexpected AI response shape is rejected without mutating campaign state', async ({ page }) => {
+  await page.route('https://openrouter.ai/api/v1/chat/completions', route =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ choices: [] }) })
+  );
+  await createCampaign(page, 'اختبار الرد', 'المغامر');
+  await page.getByLabel(/مفتاح API/).fill('test-session-key');
+  await page.getByLabel(/ما الذي تريد فعله/).fill('تحدث إلى الحارس');
+  await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('أعاد المزود رداً فارغاً');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.revision).toBe(1);
+  expect(saved.events).toHaveLength(0);
+});
+
+test('layout remains usable at a phone viewport and Arabic direction is RTL', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByLabel('اسم العالم')).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  expect(overflow).toBe(false);
 });
