@@ -12,26 +12,26 @@ function ensureSystems(s){
   if(!s.systems||typeof s.systems!=='object')s.systems={};
   const g=s.systems;
   if(!g.location)g.location='بوابة الرماد';
-  if(!g.map||!Array.isArray(g.map.visited))g.map={visited:[g.location]};
-  if(!g.stats)g.stats={level:1,xp:0,hp:100,maxHp:100,mana:40,maxMana:40,gold:25};
-  if(!g.inventory||!Array.isArray(g.inventory.items))g.inventory={items:[{id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:2,description:'تعيد 30 نقطة صحة'},{id:'rusty-sword',name:'سيف قديم',type:'weapon',quantity:1,description:'سلاح البداية'},{id:'herb',name:'عشب طبي',type:'material',quantity:3,description:'مادة لصناعة الجرعات'},{id:'iron-ore',name:'خام الحديد',type:'material',quantity:2,description:'مادة حرفية'}]};
-  if(!g.equipment)g.equipment={weapon:'rusty-sword',armor:null};
-  if(!g.skills||!Array.isArray(g.skills.learned))g.skills={points:1,learned:[s.player.className==='mage'?'arcane-bolt':s.player.className==='rogue'?'shadow-step':'power-strike']};
-  if(!g.achievements||!Array.isArray(g.achievements.entries))g.achievements={entries:[]};
-  if(!g.journal||!Array.isArray(g.journal.entries))g.journal={entries:[]};
-  if(!g.memory||typeof g.memory!=='object')g.memory={knowledge:[],beliefs:[],rumors:[],summaries:[]};
-  if(!g.quests||!Array.isArray(g.quests.entries))g.quests={entries:[
+  if(!g.map||typeof g.map!=='object'||Array.isArray(g.map)||!Array.isArray(g.map.visited))g.map={visited:[g.location]};
+  if(!g.stats||typeof g.stats!=='object'||Array.isArray(g.stats))g.stats={level:1,xp:0,hp:100,maxHp:100,mana:40,maxMana:40,gold:25};
+  if(!g.inventory||typeof g.inventory!=='object'||Array.isArray(g.inventory)||!Array.isArray(g.inventory.items))g.inventory={items:[{id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:2,description:'تعيد 30 نقطة صحة'},{id:'rusty-sword',name:'سيف قديم',type:'weapon',quantity:1,description:'سلاح البداية'},{id:'herb',name:'عشب طبي',type:'material',quantity:3,description:'مادة لصناعة الجرعات'},{id:'iron-ore',name:'خام الحديد',type:'material',quantity:2,description:'مادة حرفية'}]};
+  if(!g.equipment||typeof g.equipment!=='object'||Array.isArray(g.equipment))g.equipment={weapon:'rusty-sword',armor:null};
+  if(!g.skills||typeof g.skills!=='object'||Array.isArray(g.skills)||!Array.isArray(g.skills.learned))g.skills={points:1,learned:[s.player.className==='mage'?'arcane-bolt':s.player.className==='rogue'?'shadow-step':'power-strike']};
+  if(!g.achievements||typeof g.achievements!=='object'||Array.isArray(g.achievements)||!Array.isArray(g.achievements.entries))g.achievements={entries:[]};
+  if(!g.journal||typeof g.journal!=='object'||Array.isArray(g.journal)||!Array.isArray(g.journal.entries))g.journal={entries:[]};
+  if(!g.memory||typeof g.memory!=='object'||Array.isArray(g.memory))g.memory={knowledge:[],beliefs:[],rumors:[],summaries:[]};
+  if(!g.quests||typeof g.quests!=='object'||Array.isArray(g.quests)||!Array.isArray(g.quests.entries))g.quests={entries:[
     {id:'quest-gate',title:'سر البوابة',description:'اكتشف ما وراء بوابة الرماد',status:'available',progress:0,goal:2,rewardXp:35,rewardGold:20}
   ]};
-  if(!g.relations||!Array.isArray(g.relations.entries))g.relations={entries:[
+  if(!g.relations||typeof g.relations!=='object'||Array.isArray(g.relations)||!Array.isArray(g.relations.entries))g.relations={entries:[
     {id:'npc-guard',name:'حارس البوابة',role:'حارس',score:0,history:[]},
     {id:'npc-herbalist',name:'العشّابة ميرا',role:'معالجة',score:0,history:[]}
   ]};
-  if(!g.factions||!Array.isArray(g.factions.entries))g.factions={entries:[
+  if(!g.factions||typeof g.factions!=='object'||Array.isArray(g.factions)||!Array.isArray(g.factions.entries))g.factions={entries:[
     {id:'faction-wardens',name:'حرّاس الفجر',reputation:0,rank:'غريب'},
     {id:'faction-veil',name:'رابطة الحجاب',reputation:0,rank:'غريب'}
   ]};
-  if(!g.combat)g.combat={active:false,enemy:null,turn:0,log:[]};
+  if(!g.combat||typeof g.combat!=='object'||Array.isArray(g.combat))g.combat={active:false,enemy:null,turn:0,log:[]};
   if(!g.flags||typeof g.flags!=='object')g.flags={};
   const st=g.stats;st.level=cleanNumber(st.level,1,100,1);st.xp=cleanNumber(st.xp,0,1e7,0);st.maxHp=cleanNumber(st.maxHp,1,100000,100);st.hp=cleanNumber(st.hp,0,st.maxHp,st.maxHp);st.maxMana=cleanNumber(st.maxMana,0,100000,40);st.mana=cleanNumber(st.mana,0,st.maxMana,st.maxMana);st.gold=cleanNumber(st.gold,0,1e7,0);
   g.inventory.items=g.inventory.items.filter(i=>i&&typeof i==='object'&&typeof i.id==='string'&&typeof i.name==='string').map(i=>({id:cleanText(i.id,60),name:cleanText(i.name,80),type:cleanText(i.type,30),quantity:cleanNumber(i.quantity,0,999,0),description:cleanText(i.description,300)}));
