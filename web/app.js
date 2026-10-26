@@ -12,10 +12,12 @@ function ensureSystems(s){
   if(!g.location)g.location='بوابة الرماد';
   if(!g.map||!Array.isArray(g.map.visited))g.map={visited:[g.location]};
   if(!g.stats)g.stats={level:1,xp:0,hp:100,maxHp:100,mana:40,maxMana:40,gold:25};
-  if(!g.inventory||!Array.isArray(g.inventory.items))g.inventory={items:[
-    {id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:2,description:'تعيد 30 نقطة صحة'},
-    {id:'rusty-sword',name:'سيف قديم',type:'weapon',quantity:1,description:'سلاح البداية'}
-  ]};
+  if(!g.inventory||!Array.isArray(g.inventory.items))g.inventory={items:[{id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:2,description:'تعيد 30 نقطة صحة'},{id:'rusty-sword',name:'سيف قديم',type:'weapon',quantity:1,description:'سلاح البداية'},{id:'herb',name:'عشب طبي',type:'material',quantity:3,description:'مادة لصناعة الجرعات'},{id:'iron-ore',name:'خام الحديد',type:'material',quantity:2,description:'مادة حرفية'}]};
+  if(!g.equipment)g.equipment={weapon:'rusty-sword',armor:null};
+  if(!g.skills||!Array.isArray(g.skills.learned))g.skills={points:1,learned:[s.player.className==='mage'?'arcane-bolt':s.player.className==='rogue'?'shadow-step':'power-strike']};
+  if(!g.achievements||!Array.isArray(g.achievements.entries))g.achievements={entries:[]};
+  if(!g.journal||!Array.isArray(g.journal.entries))g.journal={entries:[]};
+  if(!g.memory||typeof g.memory!=='object')g.memory={knowledge:[],beliefs:[],rumors:[],summaries:[]};
   if(!g.quests||!Array.isArray(g.quests.entries))g.quests={entries:[
     {id:'quest-gate',title:'سر البوابة',description:'اكتشف ما وراء بوابة الرماد',status:'available',progress:0,goal:2,rewardXp:35,rewardGold:20}
   ]};
@@ -36,6 +38,9 @@ function systemEvent(action,description){
   const previous=JSON.parse(JSON.stringify(state)),base=state.revision;
   state=ensureSystems(state);
   state.events.push({id:'evt_'+base+'_'+crypto.randomUUID(),type:'gameplay',revisionBase:base,authorized:true,action,description,at:new Date().toISOString()});
+  state.systems.journal.entries.push({id:'journal_'+base,action,description,at:new Date().toISOString(),location:state.systems.location});
+  const achievements=[['first-event','خطوتك الأولى',state.events.length>=1],['first-victory','أول انتصار',action==='هجوم'&&description.includes('انتصرت')],['quest-complete','صائد المهام',action==='إكمال مهمة'],['explorer','رحّالة',state.systems.map.visited.length>=4]];
+  for(const [id,title,earned] of achievements)if(earned&&!state.systems.achievements.entries.some(a=>a.id===id))state.systems.achievements.entries.push({id,title,at:new Date().toISOString()});
   state.revision++;state.narrative=description;
   if(!persist()){state=previous;return false}
   render();status('gameStatus',description,'ok');return true;
@@ -49,6 +54,17 @@ function renderSystems(){
   $('relationList').innerHTML=g.relations.entries.map((r,i)=>'<div class="item"><b>'+escapeHtml(r.name)+'</b><span class="pill">'+escapeHtml(r.role)+'</span><p>العلاقة: '+r.score+' · '+(r.history.length?r.history[r.history.length-1]:'لم يحدث تفاعل بعد')+'</p><button data-rel="'+i+'" data-delta="5">ساعده (+5)</button> <button data-rel="'+i+'" data-delta="-5">أسئ إليه (-5)</button></div>').join('');
   $('factionList').innerHTML=g.factions.entries.map((f,i)=>'<div class="item"><b>'+escapeHtml(f.name)+'</b><span class="pill">'+escapeHtml(f.rank)+'</span><p>السمعة: '+f.reputation+'</p><button data-faction="'+i+'" data-delta="10">خدمة الفصيل (+10)</button> <button data-faction="'+i+'" data-delta="-10">معارضة الفصيل (-10)</button></div>').join('');
   $('locationList').innerHTML=['بوابة الرماد','الغابة الموشّحة','قرية السرو','أطلال القمر'].map((loc,i)=>'<button data-location="'+escapeHtml(loc)+'">'+escapeHtml(loc)+(g.map.visited.includes(loc)?' ✓':'')+'</button>').join(' ');
+  $('equipmentInfo').textContent='السلاح المجهز: '+(g.inventory.items.find(i=>i.id===g.equipment.weapon)?.name||'لا يوجد')+' · الدرع: '+(g.equipment.armor||'لا يوجد');
+  $('skillList').innerHTML=[{id:'power-strike',name:'ضربة قاضية',cost:8,desc:'ضرر إضافي للمحارب'},{id:'arcane-bolt',name:'قذيفة أركان',cost:10,desc:'ضرر سحري'},{id:'shadow-step',name:'خطوة الظل',cost:7,desc:'ضربة سريعة'}].map(s=>'<div class="item"><b>'+s.name+'</b><p>'+s.desc+' · كلفة المانا '+s.cost+'</p>'+(g.skills.learned.includes(s.id)?'<span class="pill">متعلّمة</span>':'<button data-skill="'+s.id+'">تعلّم (نقطة مهارة)</button>')+(g.skills.learned.includes(s.id)&&g.combat.active?'<button data-cast="'+s.id+'">استخدم المهارة</button>':'')+'</div>').join('');
+  $('shopList').innerHTML='<p>الذهب: '+g.stats.gold+'</p><button id="buyPotionBtn">شراء جرعة علاج — 10 ذهب</button><button id="craftPotionBtn">صناعة جرعة (عشبان)</button><button id="equipSwordBtn">تجهيز السيف القديم</button>';
+  $('achievementList').innerHTML=g.achievements.entries.length?g.achievements.entries.map(a=>'<span class="pill">'+escapeHtml(a.title)+'</span>').join(' '):'<p>لا إنجازات بعد. ابدأ مغامرتك!</p>';
+  $('journalList').innerHTML=g.journal.entries.slice(-12).reverse().map(j=>'<div class="item"><b>'+escapeHtml(j.action)+'</b><p>'+escapeHtml(j.description)+'</p><small class="muted">'+escapeHtml(j.location)+' · '+escapeHtml(j.at)+'</small></div>').join('')||'<p>السجل فارغ.</p>';
+  $('canonList').innerHTML=Object.entries(state.world.canonFacts||{}).map(([k,v])=>'<div class="item"><b>'+escapeHtml(k)+'</b><p>'+escapeHtml(v)+'</p></div>').join('')||'<p>لم تسجل حقائق قانونية بعد.</p>';
+  $('memoryList').innerHTML='<p>معرفة الشخصية: '+g.memory.knowledge.length+' · معتقدات: '+g.memory.beliefs.length+' · شائعات: '+g.memory.rumors.length+' · ملخصات: '+g.memory.summaries.length+'</p>';
+  $('buyPotionBtn')?.addEventListener('click',buyPotion);$('craftPotionBtn')?.addEventListener('click',craftPotion);$('equipSwordBtn')?.addEventListener('click',equipSword);
+  document.querySelectorAll('[data-skill]').forEach(b=>b.addEventListener('click',()=>learnSkill(b.dataset.skill)));
+  document.querySelectorAll('[data-cast]').forEach(b=>b.addEventListener('click',()=>castSkill(b.dataset.cast)));
+
   const combat=$('combatPanel');if(g.combat.active&&g.combat.enemy){combat.innerHTML='<b>خصم: '+escapeHtml(g.combat.enemy.name)+'</b><p>صحة الخصم: '+g.combat.enemy.hp+'/'+g.combat.enemy.maxHp+' · دور القتال: '+g.combat.turn+'</p><div class="actions"><button id="attackBtn" class="primary">هجوم</button><button id="fleeBtn">انسحاب</button></div><p>'+g.combat.log.slice(-3).map(escapeHtml).join('<br>')+'</p>'}else{combat.innerHTML='<p>لا يوجد قتال نشط.</p><button id="encounterBtn" class="primary">استكشف / ابحث عن خصم</button>'}
   $('attackBtn')?.addEventListener('click',attack);$('fleeBtn')?.addEventListener('click',flee);$('encounterBtn')?.addEventListener('click',encounter);
   document.querySelectorAll('[data-potion]').forEach(b=>b.addEventListener('click',()=>usePotion(Number(b.dataset.potion))));
@@ -59,6 +75,14 @@ function renderSystems(){
   document.querySelectorAll('[data-location]').forEach(b=>b.addEventListener('click',()=>travel(b.dataset.location)));
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function buyPotion(){if(!state)return;const g=ensureSystems(state).systems;if(g.stats.gold<10){status('gameStatus','لا تملك ذهباً كافياً.','error');return}g.stats.gold-=10;let p=g.inventory.items.find(i=>i.id==='potion-health');if(p)p.quantity++;else g.inventory.items.push({id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:1,description:'تعيد 30 نقطة صحة'});systemEvent('شراء من المتجر','اشتريت جرعة علاج مقابل 10 ذهب.')}
+function craftPotion(){if(!state)return;const g=ensureSystems(state).systems,herb=g.inventory.items.find(i=>i.id==='herb');if(!herb||herb.quantity<2){status('gameStatus','تحتاج إلى عشبين طبيين لصناعة جرعة.','error');return}herb.quantity-=2;let p=g.inventory.items.find(i=>i.id==='potion-health');if(p)p.quantity++;else g.inventory.items.push({id:'potion-health',name:'جرعة علاج',type:'consumable',quantity:1,description:'تعيد 30 نقطة صحة'});systemEvent('صناعة جرعة','صنعت جرعة علاج باستخدام عشبين طبيين.')}
+function equipSword(){if(!state)return;const g=ensureSystems(state).systems;if(!g.inventory.items.some(i=>i.id==='rusty-sword'&&i.quantity>0)){status('gameStatus','السيف غير موجود في المخزون.','error');return}g.equipment.weapon='rusty-sword';systemEvent('تجهيز سلاح','جهزت السيف القديم.')}
+function learnSkill(id){if(!state)return;const g=ensureSystems(state).systems;if(g.skills.learned.includes(id))return;if(g.skills.points<1){status('gameStatus','لا توجد نقاط مهارة كافية.','error');return}const valid=['power-strike','arcane-bolt','shadow-step'];if(!valid.includes(id))return;g.skills.points--;g.skills.learned.push(id);systemEvent('تعلم مهارة','تعلمت مهارة جديدة: '+id+'.')}
+function castSkill(id){if(!state)return;const g=ensureSystems(state).systems;if(!g.combat.active||!g.skills.learned.includes(id))return;const costs={'power-strike':8,'arcane-bolt':10,'shadow-step':7},cost=costs[id]||10;if(g.stats.mana<cost){status('gameStatus','المانا غير كافية.','error');return}g.stats.mana-=cost;const bonus={'power-strike':16,'arcane-bolt':19,'shadow-step':13}[id]||10;g.combat.enemy.hp=Math.max(0,g.combat.enemy.hp+0-bonus);g.combat.turn++;g.combat.log.push('استخدمت '+id+' وألحقت '+bonus+' ضرر.');if(g.combat.enemy.hp<=0){const e=g.combat.enemy;g.stats.xp+=e.xp;g.stats.gold+=e.gold;g.combat.active=false;g.combat.enemy=null;levelUp(g);g.combat.log.push('انتصرت على الخصم بالمَهارة.')}else{g.stats.hp=Math.max(1,g.stats.hp-Math.max(2,g.combat.enemy.attack-2));g.combat.log.push('رد الخصم على المهارة.')}systemEvent('استخدام مهارة','استخدمت '+id+' في القتال.')}
+function addCanon(){if(!state)return;const key=$('canonKey').value.trim(),value=$('canonValue').value.trim();if(!key||!value||key.length>60||value.length>300){status('gameStatus','أدخل عنوان حقيقة (حتى 60 حرفاً) ومحتوى (حتى 300 حرف).','error');return}if(Object.prototype.hasOwnProperty.call(state.world.canonFacts,key)){status('gameStatus','هذه الحقيقة موجودة؛ لا تستبدل حقيقة قانونية بصمت.','error');return}const previous=JSON.parse(JSON.stringify(state));state.world.canonFacts[key]=value;if(!systemEvent('إضافة حقيقة قانونية','أضاف اللاعب حقيقة للعالم: '+key)){state=previous;return}$('canonKey').value='';$('canonValue').value=''}
+
 function encounter(){
   if(!state)return;const g=ensureSystems(state).systems;
   if(g.combat.active)return;
