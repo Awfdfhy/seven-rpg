@@ -22,7 +22,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package.json
       - run: npm install --prefix web
-      - run: npx --prefix web playwright install --with-deps chromium
+      - run: npx --prefix web playwright install chromium
       - run: npm --prefix web run test:e2e
       - uses: actions/upload-artifact@v4
         if: always()
