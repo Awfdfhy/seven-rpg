@@ -19,20 +19,20 @@ data class GameState(
     val campaignSettings: CampaignSettings? = null
 ) {
     fun toMap(): Map<String, Any> {
-        return mapOf(
-            "world" to world?.toMap(),
-            "player" to player?.toMap(),
-            "scene" to scene?.toMap(),
-            "events" to events.map { it.toMap() },
-            "revision" to revision,
-            "canonFacts" to canonFacts,
-            "confirmedEventLog" to confirmedEventLog.map { it.toMap() },
-            "characterKnowledge" to characterKnowledge,
-            "characterBeliefs" to characterBeliefs,
-            "rumors" to rumors,
-            "summaries" to summaries,
-            "campaignSettings" to campaignSettings?.toMap()
-        )
+        val result = linkedMapOf<String, Any>()
+        world?.let { result["world"] = it.toMap() }
+        player?.let { result["player"] = it.toMap() }
+        scene?.let { result["scene"] = it.toMap() }
+        result["events"] = events.map { it.toMap() }
+        result["revision"] = revision
+        result["canonFacts"] = canonFacts
+        result["confirmedEventLog"] = confirmedEventLog.map { it.toMap() }
+        result["characterKnowledge"] = characterKnowledge
+        result["characterBeliefs"] = characterBeliefs
+        result["rumors"] = rumors
+        result["summaries"] = summaries
+        campaignSettings?.let { result["campaignSettings"] = it.toMap() }
+        return result
     }
 
     companion object {
