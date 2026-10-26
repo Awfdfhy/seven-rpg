@@ -10,12 +10,15 @@ data class ExtendedGameState(
     val worldMap: WorldMap,
     val combatState: CombatState? = null
 ) {
-    fun toMap(): Map<String, Any> = mapOf(
-        "gameState" to gameState.toMap(),
-        "playerProgression" to playerProgression.toMap(),
-        "worldMap" to worldMap.toMap(),
-        "combatState" to combatState?.toMap()
-    )
+    fun toMap(): Map<String, Any> {
+        val result = linkedMapOf<String, Any>(
+            "gameState" to gameState.toMap(),
+            "playerProgression" to playerProgression.toMap(),
+            "worldMap" to worldMap.toMap()
+        )
+        combatState?.let { result["combatState"] = it.toMap() }
+        return result
+    }
 
     companion object {
         fun fromMap(data: Map<String, Any>): ExtendedGameState = ExtendedGameState(
