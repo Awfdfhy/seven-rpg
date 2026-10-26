@@ -6,6 +6,10 @@ on:
       - "apk/*"
   workflow_dispatch:
 
+concurrency:
+  group: seven-rpg-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
