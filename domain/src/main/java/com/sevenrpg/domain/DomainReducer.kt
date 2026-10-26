@@ -51,7 +51,7 @@ object DomainReducer {
         }
 
         // Check for duplicate event IDs (idempotency)
-        val events = proposal["events"] as? List<*> ?: emptyList()
+        val events = proposal["events"] as? List<*> ?: emptyList<Any>()
         val seenIds = mutableSetOf<String>()
         for (event in events) {
             val eventMap = event as? Map<String, Any> ?: continue
