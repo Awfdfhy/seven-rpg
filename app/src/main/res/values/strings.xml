@@ -18,7 +18,7 @@
     <string name="create_character">إنشاء الشخصية</string>
     <string name="scene_title">المشهد</string>
     <string name="back_to_world">العودة للعالم</string>
-    <string name="submit_action">إجراء إجراء</string>
+    <string name="submit_action">اختيار الفعل</string>
     <string name="action_hint">اكتب إجراءك هنا… (مثل: استكشف الغابة، تحدث إلى الحارس، افتح الصندوق)</string>
     <string name="action_required">الإجراء مطلوب</string>
     <string name="action_too_long">الإجراء طويل جداً (أقصى 200 حرف)</string>
