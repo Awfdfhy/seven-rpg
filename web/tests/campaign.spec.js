@@ -323,7 +323,7 @@ test('health potion consumes one item and restores health without exceeding maxi
 
 test('skills consume mana, equipment state persists, and the shop respects gold', async ({ page }) => {
   await createCampaign(page, 'أرض المهارات', 'فارس');
-  await page.getByRole('button', { name: 'تعلّم (نقطة مهارة)' }).click();
+  await page.getByRole('button', { name: 'تعلّم (نقطة مهارة)' }).first().click();
   await expect(page.locator('#skillList')).toContainText('متعلّمة');
   await page.getByRole('button', { name: 'شراء جرعة علاج — 10 ذهب' }).click();
   await expect(page.locator('#statsPanel')).toContainText('الذهب 15');
@@ -340,7 +340,7 @@ test('skills consume mana, equipment state persists, and the shop respects gold'
 test('player-authored canon facts are persistent and cannot be silently overwritten', async ({ page }) => {
   await createCampaign(page, 'عالم القانون', 'كاتبة');
   await page.getByLabel('عنوان الحقيقة').fill('عهد السحر');
-  await page.getByLabel('الحقيقة').fill('لا يمكن إحياء الموتى في هذا العالم.');
+  await page.getByLabel('الحقيقة', { exact: true }).fill('لا يمكن إحياء الموتى في هذا العالم.');
   await page.getByRole('button', { name: 'إضافة حقيقة قانونية' }).click();
   await expect(page.locator('#canonList')).toContainText('لا يمكن إحياء الموتى');
   await page.getByLabel('عنوان الحقيقة').fill('عهد السحر');
