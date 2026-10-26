@@ -2,66 +2,41 @@ package com.sevenrpg.app.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.sevenrpg.app.GameStateStore
 import com.sevenrpg.app.databinding.ActivityLaunchBinding
-import com.sevenrpg.domain.DomainModule
 import com.sevenrpg.domain.GameState
-import com.sevenrpg.domain.PlayerCommand
-import com.sevenrpg.domain.ValidationResult
-import com.sevenrpg.domain.DomainReducer
 
-/**
- * Launch Screen — Entry point for Seven RPG MVP-0.
- * Directive: multi-agent-architect — one responsibility: launch screen only.
- * Directive: ui-visual-validator — RTL support, touch targets, focus rings.
- */
+/** Entry point for the Seven RPG MVP. */
 class LaunchActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityLaunchBinding
-    private val aiProvider = DomainModule.createMockProvider()
-    private var gameState = GameState.createInitial()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLaunchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // RTL support
         binding.root.layoutDirection = android.view.View.LAYOUT_DIRECTION_RTL
-
-        binding.btnNewGame.setOnClickListener {
-            startNewGame()
-        }
-
-        binding.btnLoadSave.setOnClickListener {
-            loadExistingSave()
-        }
+        binding.btnNewGame.setOnClickListener { startNewGame() }
+        binding.btnLoadSave.setOnClickListener { loadExistingSave() }
     }
 
     private fun startNewGame() {
-        binding.btnNewGame.isEnabled = false
-        binding.btnLoadSave.isEnabled = false
-
-        // Simulate async action
-        binding.root.postDelayed({
-            gameState = GameState.createInitial()
-            navigateToWorldCreation()
-        }, 800)
+        val draft = GameState.createInitial()
+        if (!GameStateStore.saveDraft(this, draft)) {
+            Toast.makeText(this, "تعذّر بدء مسودة اللعبة على الجهاز.", Toast.LENGTH_LONG).show()
+            return
+        }
+        startActivity(Intent(this, WorldCreationActivity::class.java))
     }
 
     private fun loadExistingSave() {
-        binding.btnNewGame.isEnabled = false
-        binding.btnLoadSave.isEnabled = false
-
-        // Simulate async load
-        binding.root.postDelayed({
-            // In production: load from DataStore/SQLite
-            navigateToWorldCreation()
-        }, 800)
-    }
-
-    private fun navigateToWorldCreation() {
-        val intent = Intent(this, WorldCreationActivity::class.java)
-        startActivity(intent)
+        val saved = GameStateStore.load(this)
+        if (saved?.world == null || saved.player == null) {
+            Toast.makeText(this, "لا يوجد حفظ صالح بعد. ابدأ لعبة جديدة أولاً.", Toast.LENGTH_LONG).show()
+            return
+        }
+        startActivity(Intent(this, SceneEntryActivity::class.java)
+            .putExtra("gameState", GameStateStore.encode(saved)))
     }
 }
