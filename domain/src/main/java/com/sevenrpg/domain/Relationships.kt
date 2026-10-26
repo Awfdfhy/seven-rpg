@@ -65,10 +65,12 @@ data class RelationshipNetwork(
 
     companion object {
         fun fromMap(data: Map<String, Any>): RelationshipNetwork = RelationshipNetwork(
-            relationships = (data["relationships"] as? Map<*, *>)
-                ?.mapValues { it.value as Map<String, Any> }
-                ?.mapValues { CharacterRelationship.fromMap(it) }
-                ?: emptyMap()
+            relationships = (data["relationships"] as? Map<*, *>)?.entries
+                ?.mapNotNull { entry ->
+                    val key = entry.key as? String ?: return@mapNotNull null
+                    val value = entry.value as? Map<String, Any> ?: return@mapNotNull null
+                    key to CharacterRelationship.fromMap(value)
+                }?.toMap() ?: emptyMap()
         )
     }
 }
