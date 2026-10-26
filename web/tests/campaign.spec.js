@@ -408,3 +408,16 @@ test('manual save button reports success and preserves the active campaign', asy
   expect(saved.world.name).toBe('اختبار الحفظ اليدوي');
   expect(saved.player.name).toBe('الحارس');
 });
+
+test('winning with a learned combat skill awards the first-victory achievement', async ({ page }) => {
+  await createCampaign(page, 'ميدان المهارات', 'المحارب');
+  await page.getByRole('button', { name: 'استكشف / ابحث عن خصم' }).click();
+  const cast = page.getByRole('button', { name: 'استخدم المهارة' });
+  await cast.click();
+  await page.getByRole('button', { name: 'استخدم المهارة' }).click();
+  await page.getByRole('button', { name: 'استخدم المهارة' }).click();
+  await expect(page.locator('#combatPanel')).toContainText('لا يوجد قتال نشط');
+  await expect(page.locator('#achievementList')).toContainText('أول انتصار');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.achievements.entries.some(a => a.id === 'first-victory')).toBe(true);
+});
