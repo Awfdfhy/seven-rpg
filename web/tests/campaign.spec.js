@@ -399,3 +399,12 @@ test('failed storage during a shop purchase rolls back gold and inventory', asyn
   expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(2);
   await expect(page.locator('#statsPanel')).toContainText('الذهب 25');
 });
+
+test('manual save button reports success and preserves the active campaign', async ({ page }) => {
+  await createCampaign(page, 'اختبار الحفظ اليدوي', 'الحارس');
+  await page.getByRole('button', { name: 'حفظ الآن' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('تم تثبيت الحفظ محلياً');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.world.name).toBe('اختبار الحفظ اليدوي');
+  expect(saved.player.name).toBe('الحارس');
+});
