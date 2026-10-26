@@ -63,7 +63,7 @@ function encounter(){
   if(!state)return;const g=ensureSystems(state).systems;
   if(g.combat.active)return;
   const enemies=[{id:'ash-wolf',name:'ذئب الرماد',hp:34,attack:8,xp:18,gold:7},{id:'lost-sentinel',name:'حارس تائه',hp:48,attack:11,xp:25,gold:12},{id:'veil-stalker',name:'مطارد الحجاب',hp:42,attack:9,xp:22,gold:10}];
-  const e=enemies[(g.stats.xp+g.stats.level+g.combat.turn)%enemies.length];
+  const e=enemies[(g.stats.xp+g.stats.level-1+g.combat.turn)%enemies.length];
   g.combat={active:true,enemy:{...e,maxHp:e.hp},turn:0,log:['ظهر '+e.name+' عند '+g.location+'.']};
   systemEvent('بدء مواجهة', 'ظهر '+e.name+'! يمكنك الهجوم أو الانسحاب.');
 }
