@@ -56,9 +56,7 @@ class ActionSubmitActivity : AppCompatActivity() {
 
         binding.btnExecute.isEnabled = false
         binding.btnCancel.isEnabled = false
-        binding.loadingOverlay.visibility = View.VISIBLE
         binding.root.postDelayed({
-            binding.loadingOverlay.visibility = View.GONE
             val command = PlayerCommand.create(
                 playerId = player.playerId,
                 sceneId = scene.sceneId,
