@@ -46,7 +46,10 @@ class ActionSubmitActivity : AppCompatActivity() {
     private fun executeAction() {
         val actionText = binding.etAction.text.toString().trim()
         if (actionText.isBlank() || actionText.length > 200) return
-        if (gameState.player == null || gameState.scene == null || gameState.world == null) {
+        val player = gameState.player
+        val scene = gameState.scene
+        val world = gameState.world
+        if (player == null || scene == null || world == null) {
             Toast.makeText(this, "لا توجد حملة مكتملة. ابدأ لعبة جديدة.", Toast.LENGTH_LONG).show()
             return
         }
@@ -57,8 +60,8 @@ class ActionSubmitActivity : AppCompatActivity() {
         binding.root.postDelayed({
             binding.loadingOverlay.visibility = View.GONE
             val command = PlayerCommand.create(
-                playerId = gameState.player.playerId,
-                sceneId = gameState.scene.sceneId,
+                playerId = player.playerId,
+                sceneId = scene.sceneId,
                 action = actionText,
                 revisionBase = gameState.revision
             )
@@ -70,9 +73,9 @@ class ActionSubmitActivity : AppCompatActivity() {
             }
 
             val context = mapOf(
-                "worldId" to gameState.world.worldId,
-                "playerId" to gameState.player.playerId,
-                "sceneId" to gameState.scene.sceneId
+                "worldId" to world.worldId,
+                "playerId" to player.playerId,
+                "sceneId" to scene.sceneId
             )
             val proposal = aiProvider.generateNarrative(actionText, context, gameState.revision)
             val proposalValidation = DomainReducer.validateProposal(proposal.toMap(), gameState)
@@ -94,7 +97,7 @@ class ActionSubmitActivity : AppCompatActivity() {
             }
             binding.responseText.text = proposal.prose
             binding.responseCard.visibility = View.VISIBLE
-            binding.responseCard.scrollTo(0)
+            binding.responseCard.scrollTo(0, 0)
             restoreButtons()
         }, 250)
     }
