@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -38,6 +38,20 @@ jobs:
       - name: Run Android unit tests
         run: gradle --no-daemon :app:testDebugUnitTest
 
+      - name: Set up Node.js for browser parity tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install browser test dependencies
+        run: npm install --prefix web
+
+      - name: Install Chromium for browser tests
+        run: npx --prefix web playwright install --with-deps chromium
+
+      - name: Test browser edition in Chromium
+        run: npm --prefix web run test:e2e
+
       - name: Record APK checksum
         if: always()
         run: |
@@ -58,3 +72,21 @@ jobs:
             app-debug.sha256
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Publish tested preview release
+        if: success() && github.ref == 'refs/heads/apk/release-2026-10-26'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0-preview-2026-10-26
+          name: Seven RPG v0.1.0 Preview — 26 Oct 2026
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            Automated preview build. Android debug APK and SHA-256 checksum are attached.
+            Android Gradle build, Android unit tests, and browser Chromium end-to-end tests must all pass before publication.
+            This is a debug-signed preview, not a production-signed store release. A physical-device install/playtest has not been certified by CI.
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app-debug.sha256
+          fail_on_unmatched_files: true
