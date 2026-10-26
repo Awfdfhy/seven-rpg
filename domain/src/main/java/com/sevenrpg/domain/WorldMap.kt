@@ -62,17 +62,22 @@ data class WorldMap(
 
     fun getLocation(locationId: String): WorldLocation? = locations[locationId]
 
-    fun toMap(): Map<String, Any> = mapOf(
-        "locations" to locations.mapValues { it.value.toMap() },
-        "currentLocationId" to currentLocationId
-    )
+    fun toMap(): Map<String, Any> {
+        val result = linkedMapOf<String, Any>(
+            "locations" to locations.mapValues { it.value.toMap() }
+        )
+        currentLocationId?.let { result["currentLocationId"] = it }
+        return result
+    }
 
     companion object {
         fun fromMap(data: Map<String, Any>): WorldMap = WorldMap(
-            locations = (data["locations"] as? Map<*, *>)
-                ?.mapValues { it.value as Map<String, Any> }
-                ?.mapValues { WorldLocation.fromMap(it) }
-                ?: emptyMap(),
+            locations = (data["locations"] as? Map<*, *>)?.entries
+                ?.mapNotNull { entry ->
+                    val key = entry.key as? String ?: return@mapNotNull null
+                    val value = entry.value as? Map<String, Any> ?: return@mapNotNull null
+                    key to WorldLocation.fromMap(value)
+                }?.toMap() ?: emptyMap(),
             currentLocationId = data["currentLocationId"] as? String
         )
     }
