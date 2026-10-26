@@ -152,7 +152,7 @@ object ExtendedReducer {
         val participants = (event.payload["participants"] as? List<Map<String, Any>>)
             ?.map { CombatParticipant.fromMap(it) }
             ?: emptyList()
-        val combat = CombatState(combatId = combatId, participants = participants, revisionBase = state.gameState.revision)
+        val combat = CombatState(combatId = combatId, participants = participants)
         return Pair(state.copy(combatState = combat), true)
     }
 
