@@ -63,7 +63,10 @@ button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);bor
 <label for="canonValue">الحقيقة</label><textarea id="canonValue" maxlength="300" placeholder="حقيقة ثابتة في هذا العالم"></textarea>
 <button id="canonAddBtn">إضافة حقيقة قانونية</button><div id="canonList"></div>
 </div>
-<div class="item"><h3>🧠 الذاكرة حسب النوع</h3><p>الفصل بين المعرفة والمعتقدات والشائعات والملخصات يمنع التعامل مع الشائعة كحقيقة مؤكدة.</p><div id="memoryList"></div></div>
+<div class="item"><h3>🧠 الذاكرة حسب النوع</h3><p>الفصل بين المعرفة والمعتقدات والشائعات والملخصات يمنع التعامل مع الشائعة كحقيقة مؤكدة.</p><label for="memoryType">نوع الذاكرة</label><select id="memoryType"><option value="knowledge">معرفة مؤكدة للشخصية</option><option value="beliefs">اعتقاد غير مؤكد</option><option value="rumors">شائعة</option><option value="summaries">ملخص ذو مصدر</option></select>
+<label for="memoryText">المحتوى</label><textarea id="memoryText" maxlength="1000" placeholder="ماذا تعرف الشخصية أو تعتقد أو تسمع؟"></textarea>
+<label for="memorySource">المصدر / صاحب المعلومة</label><input id="memorySource" maxlength="100" placeholder="مثال: حارس البوابة">
+<button id="memoryAddBtn">حفظ في ذاكرة الشخصية</button><div id="memoryList"></div></div>
 </section>
 <section class="panel" id="aiPanel">
 <h2>✧ اتصال الذكاء الاصطناعي</h2><p>يدعم واجهة OpenAI-compatible. أدخل عنوان Chat Completions واسم النموذج ومفتاحك.</p>
