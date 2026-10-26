@@ -14,7 +14,7 @@
         android:textColor="@color/primary_500"
         android:textSize="@dimen/text_3xl"
         android:textStyle="bold"
-        android:fontFamily="@font/rakkas"
+        android:fontFamily="serif"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -23,26 +23,61 @@
         android:id="@+id/narrative_card"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/space_6"
-        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:layout_marginHorizontal="@dimen/space_2"
         android:elevation="4dp"
         app:cardCornerRadius="@dimen/radius_xl"
-        app:cardBackgroundColor="@color/surface_panel_light">
+        app:cardBackgroundColor="@color/surface_panel_light"
+        app:layout_constraintTop_toBottomOf="@id/screen_title"
+        app:layout_constraintBottom_toTopOf="@id/btn_submit_action"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/narrative_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="@dimen/space_6"
-            android:text="تستيقظ في غابة مظلمة. الأشجار المحيطة بك تحكي بأسرار قديمة، والهواء البارد يلمس بشرتك. أمامك ثلاثة طرق: طريق يؤدي إلى مدينة مضيئة في الأفق، وطريق يؤدي إلى كهف غامض، وطريق يؤدي إلى نهر هادئ."
+            android:text="تستيقظ في غابة مظلمة. الأشجار المحيطة بك تحكي بأسرار قديمة."
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_xl"
-            android:fontFamily="@font/rakkas"
+            android:fontFamily="serif"
             android:lineSpacingExtra="4sp"
-            android:gravity="end"
-            android:layout_gravity="end" />
+            android:gravity="end|top" />
 
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btn_submit_action"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_h_md"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginBottom="@dimen/space_2"
+        android:text="اختيار الفعل"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold"
+        android:backgroundTint="@color/primary_500"
+        android:textColor="#ffffff"
+        android:minHeight="@dimen/min_touch"
+        app:layout_constraintBottom_toTopOf="@id/btn_save_game"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btn_save_game"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_h_md"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginBottom="@dimen/space_2"
+        android:text="الحفظ والاستعادة"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold"
+        android:backgroundTint="@android:color/transparent"
+        android:textColor="@color/primary_600"
+        android:minHeight="@dimen/min_touch"
+        app:layout_constraintBottom_toTopOf="@id/btn_back_to_world"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btn_back_to_world"
@@ -56,22 +91,6 @@
         android:textColor="@color/primary_600"
         android:minHeight="@dimen/min_touch"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/btn_submit_action"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/button_h_md"
-        android:layout_marginHorizontal="@dimen/space_4"
-        android:layout_marginBottom="@dimen/space_4"
-        android:text="إجراء إجراء"
-        android:textSize="@dimen/text_lg"
-        android:textStyle="bold"
-        android:backgroundTint="@color/primary_500"
-        android:textColor="#ffffff"
-        android:minHeight="@dimen/min_touch"
-        app:layout_constraintBottom_toTopOf="@id/btn_back_to_world"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
