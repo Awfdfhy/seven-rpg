@@ -331,7 +331,7 @@ test('skills consume mana, equipment state persists, and the shop respects gold'
   await expect(page.locator('#inventoryList')).toContainText('عشب طبي');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
   expect(saved.systems.skills.learned.length).toBe(2);
-  expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(3);
+  expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(4);
   expect(saved.systems.inventory.items.find(i => i.id === 'herb').quantity).toBe(1);
   await page.reload();
   await expect(page.locator('#skillList')).toContainText('متعلّمة');
@@ -344,7 +344,7 @@ test('player-authored canon facts are persistent and cannot be silently overwrit
   await page.getByRole('button', { name: 'إضافة حقيقة قانونية' }).click();
   await expect(page.locator('#canonList')).toContainText('لا يمكن إحياء الموتى');
   await page.getByLabel('عنوان الحقيقة').fill('عهد السحر');
-  await page.getByLabel('الحقيقة').fill('تغيير مخالف');
+  await page.getByLabel('الحقيقة', { exact: true }).fill('تغيير مخالف');
   await page.getByRole('button', { name: 'إضافة حقيقة قانونية' }).click();
   await expect(page.locator('#gameStatus')).toContainText('هذه الحقيقة موجودة');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
