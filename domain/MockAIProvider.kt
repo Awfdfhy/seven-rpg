@@ -1,6 +1,5 @@
 package com.sevenrpg.domain
 
-import java.util.*
 
 /**
  * Deterministic mock AI provider for MVP-0 testing.
@@ -20,8 +19,7 @@ class MockAIProvider(private val seed: String = "mock-default") : AIProvider {
         lastRequest = mapOf(
             "goal" to goal.take(80),
             "contextKeys" to context.keys,
-            "revision" to revision,
-            "timestamp" to java.time.Instant.now().toString()
+            "revision" to revision
         )
 
         // Deterministic narrative based on goal hash (no randomness)
@@ -36,7 +34,7 @@ class MockAIProvider(private val seed: String = "mock-default") : AIProvider {
         val prose = proseTemplates[narrativeSeed.absoluteValue % proseTemplates.size].replace("{goal}", goal.take(50))
 
         // Deterministic event proposal
-        val eventId = "evt_${revision}_${UUID.randomUUID().toString().substring(0, 8)}"
+        val eventId = "evt_${revision}_${callCount}_${Integer.toHexString(goal.hashCode())}"
         return Proposal(
             type = "narrative_response",
             prose = prose,
