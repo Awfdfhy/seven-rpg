@@ -206,3 +206,45 @@ test('layout remains usable at a phone viewport and Arabic direction is RTL', as
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow).toBe(false);
 });
+
+
+test('structurally incomplete JSON save is rejected without replacing active campaign', async ({ page }) => {
+  await createCampaign(page, 'الحفظ السليم', 'الشخصية السليمة');
+  const originalId = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')).world.id);
+  const incomplete = {
+    schema: 1, world: { id: 'bad-world', name: 'عالم ناقص' },
+    player: { id: 'bad-player', name: 'شخصية ناقصة' },
+    difficulty: 'متوسطة', revision: 2, events: [], narrative: 'غير مكتمل', createdAt: '2026-01-01T00:00:00.000Z'
+  };
+  await page.locator('#importInput').setInputFiles({
+    name: 'incomplete.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(incomplete))
+  });
+  await expect(page.locator('#gameStatus')).toContainText('فشل الاستيراد');
+  const after = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(after.world.id).toBe(originalId);
+});
+
+test('failed local persistence rolls back a successful-looking AI result', async ({ page }) => {
+  await page.route('https://openrouter.ai/api/v1/chat/completions', route =>
+    route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ choices: [{ message: { content: 'رد تجريبي لا يجب تثبيته.' } }] })
+    })
+  );
+  await createCampaign(page, 'عالم الحفظ', 'المغامر');
+  await page.getByLabel(/مفتاح API/).fill('test-session-key');
+  await page.getByLabel(/ما الذي تريد فعله/).fill('اختبر الحفظ');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'seven_rpg_browser_save_v1') throw new DOMException('storage full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: 'نفّذ الفعل عبر AI' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('لم تتغير الحملة');
+  const saved = await page.evaluate(() => JSON.parse(Storage.prototype.getItem.call(localStorage, 'seven_rpg_browser_save_v1')));
+  expect(saved.revision).toBe(1);
+  expect(saved.events).toHaveLength(0);
+  await expect(page.locator('#narrative')).not.toContainText('رد تجريبي لا يجب تثبيته');
+});
