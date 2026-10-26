@@ -64,10 +64,12 @@ data class FactionStandings(
 
     companion object {
         fun fromMap(data: Map<String, Any>): FactionStandings = FactionStandings(
-            factions = (data["factions"] as? Map<*, *>)
-                ?.mapValues { it.value as Map<String, Any> }
-                ?.mapValues { Faction.fromMap(it) }
-                ?: emptyMap()
+            factions = (data["factions"] as? Map<*, *>)?.entries
+                ?.mapNotNull { entry ->
+                    val key = entry.key as? String ?: return@mapNotNull null
+                    val value = entry.value as? Map<String, Any> ?: return@mapNotNull null
+                    key to Faction.fromMap(value)
+                }?.toMap() ?: emptyMap()
         )
     }
 }
