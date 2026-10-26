@@ -13,16 +13,19 @@ data class Quest(
     val startTime: Long = System.currentTimeMillis(),
     val endTime: Long? = null
 ) {
-    fun toMap(): Map<String, Any> = mapOf(
-        "questId" to questId,
-        "title" to title,
-        "description" to description,
-        "status" to status,
-        "objectives" to objectives.map { it.toMap() },
-        "rewards" to rewards,
-        "startTime" to startTime,
-        "endTime" to endTime
-    )
+    fun toMap(): Map<String, Any> {
+        val result = linkedMapOf<String, Any>(
+            "questId" to questId,
+            "title" to title,
+            "description" to description,
+            "status" to status,
+            "objectives" to objectives.map { it.toMap() },
+            "rewards" to rewards,
+            "startTime" to startTime
+        )
+        endTime?.let { result["endTime"] = it }
+        return result
+    }
 
     companion object {
         fun fromMap(data: Map<String, Any>): Quest = Quest(
