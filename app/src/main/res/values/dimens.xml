@@ -52,4 +52,5 @@
     <dimen name="radius_lg">12dp</dimen>
     <dimen name="radius_xl">16dp</dimen>
     <dimen name="radius_full">9999dp</dimen>
+    <dimen name="padding_6">24dp</dimen>
 </resources>
