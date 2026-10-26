@@ -6,6 +6,8 @@ androidxAppCompat = "1.6.1"
 androidxLifecycle = "2.6.2"
 androidxActivity = "1.8.2"
 androidxCompose = "1.5.4"
+androidxConstraintLayout = "2.1.4"
+androidxCardView = "1.0.0"
 androidxTest = "1.5.0"
 androidxEspresso = "3.5.1"
 junit = "4.13.2"
@@ -13,6 +15,8 @@ junit = "4.13.2"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidxConstraintLayout" }
+androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "androidxCardView" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "androidxCompose" }
@@ -25,4 +29,5 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
