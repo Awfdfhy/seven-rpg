@@ -57,9 +57,10 @@ data class AttributeCheckResult(
 /**
  * Perform a deterministic attribute check.
  */
-fun checkAttribute(attributeValue: Int, difficultyClass: Int, roll: Int): AttributeCheckResult {
+fun checkAttribute(attributeValue: Int, difficultyClass: Int, roll: Int, attribute: String = "unknown"): AttributeCheckResult {
     val total = attributeValue + roll
     return AttributeCheckResult(
+        attribute = attribute,
         attributeValue = attributeValue,
         difficultyClass = difficultyClass,
         roll = roll,
