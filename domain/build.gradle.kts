@@ -10,13 +10,6 @@ android {
     defaultConfig {
         minSdk = 24
     }
-
-    sourceSets {
-        getByName("main") {
-            // Keep the existing domain sources in place; avoid destructive source moves.
-            java.srcDirs(".")
-        }
-    }
 }
 
 dependencies {
