@@ -14,7 +14,7 @@ header{padding:22px max(18px,calc((100vw - 900px)/2));border-bottom:1px solid #f
 .brand{display:flex;align-items:center;gap:12px}.sigil{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:22px;box-shadow:0 0 28px #d8b46a22}h1{font-size:1.15rem;margin:0;letter-spacing:.08em}.tag{color:var(--muted);font-size:.8rem}
 main{max-width:900px;margin:auto;padding:22px 16px 50px}.panel{background:linear-gradient(145deg,#211d30ee,#171522ee);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 12px 38px #0002}
 h2{font-size:1.1rem;margin:0 0 14px;color:var(--gold)}p{margin:8px 0;color:var(--muted)}label{display:block;color:var(--muted);font-size:.9rem;margin:12px 0 5px}input,textarea,select{width:100%;background:#100f19;border:1px solid #49405d;color:var(--text);padding:12px;border-radius:10px;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--gold)}textarea{min-height:95px;resize:vertical}
-button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel2);color:var(--text);cursor:pointer}button.primary{background:linear-gradient(120deg,#9e7634,#d8b46a);color:#17111d;border-color:#d8b46a}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hidden{display:none!important}.status{padding:10px 12px;border-radius:9px;background:#100f19;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}.status.ok{color:var(--green)}.status.error{color:var(--red)}.narrative{font-size:1.04rem;line-height:1.95;color:#f3edf9;white-space:pre-wrap}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:3px 9px;font-size:.8rem;color:var(--muted);margin-inline-start:6px}.muted{color:var(--muted)}.danger{color:var(--red)}footer{text-align:center;color:var(--muted);font-size:.8rem;padding:15px}
+button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel2);color:var(--text);cursor:pointer}button.primary{background:linear-gradient(120deg,#9e7634,#d8b46a);color:#17111d;border-color:#d8b46a}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hidden{display:none!important}.status{padding:10px 12px;border-radius:9px;background:#100f19;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}.status.ok{color:var(--green)}.status.error{color:var(--red)}.narrative{font-size:1.04rem;line-height:1.95;color:#f3edf9;white-space:pre-wrap}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:3px 9px;font-size:.8rem;color:var(--muted);margin-inline-start:6px}.muted{color:var(--muted)}.danger{color:var(--red)}.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0}.item h3{font-size:1rem;color:var(--gold);margin:0 0 8px}.item button{margin:5px 0}.item p{font-size:.9rem}footer{text-align:center;color:var(--muted);font-size:.8rem;padding:15px}
 @media(max-width:600px){.row{grid-template-columns:1fr}.panel{padding:15px}header{padding:15px 16px}.actions button,.actions .filebutton{flex:1 1 auto}}
 </style>
 </head>
@@ -38,6 +38,20 @@ button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);bor
 <div class="actions"><button class="primary" id="actBtn">نفّذ الفعل عبر AI</button><button id="saveBtn">حفظ الآن</button><button id="newBtn">عالم جديد</button></div>
 <div class="status" id="gameStatus" role="status">الحفظ التلقائي مفعّل.</div>
 <div class="actions"><button id="exportBtn">تصدير الحفظ JSON</button><label class="filebutton">استيراد حفظ JSON<input id="importInput" type="file" accept="application/json,.json" hidden></label></div>
+</section>
+<section class="panel hidden" id="systemsPanel" aria-label="أنظمة RPG">
+<h2>✧ أنظمة العالم والشخصية</h2>
+<div class="item"><b>الحالة والتقدم</b><p id="statsPanel" class="muted"></p></div>
+<div class="row">
+  <div class="item"><h3>⚔️ القتال</h3><div id="combatPanel"></div></div>
+  <div class="item"><h3>🎒 المخزون</h3><div id="inventoryList"></div></div>
+</div>
+<div class="item"><h3>📜 المهام</h3><div id="questList"></div></div>
+<div class="row">
+  <div class="item"><h3>🤝 العلاقات</h3><div id="relationList"></div></div>
+  <div class="item"><h3>🏰 الفصائل</h3><div id="factionList"></div></div>
+</div>
+<div class="item"><h3>🗺️ الخريطة والسفر</h3><p>اختر موقعًا لاستكشافه. السفر ممنوع أثناء القتال.</p><div id="locationList" class="actions"></div></div>
 </section>
 <section class="panel" id="aiPanel">
 <h2>✧ اتصال الذكاء الاصطناعي</h2><p>يدعم واجهة OpenAI-compatible. أدخل عنوان Chat Completions واسم النموذج ومفتاحك.</p>
