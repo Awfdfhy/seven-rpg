@@ -60,7 +60,7 @@
         android:text="الفئة"
         android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_sm"
-        android:textStyle="medium"
+        android:textStyle="normal"
         android:layout_marginTop="@dimen/space_5"
         android:layout_marginStart="@dimen/space_4"
         android:layout_marginEnd="@dimen/space_4"
