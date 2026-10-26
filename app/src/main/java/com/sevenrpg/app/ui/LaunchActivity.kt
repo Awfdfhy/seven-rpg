@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.sevenrpg.app.GameStateStore
+import com.sevenrpg.app.ui.AISettingsActivity
 import com.sevenrpg.app.databinding.ActivityLaunchBinding
 import com.sevenrpg.domain.GameState
 
@@ -19,6 +20,7 @@ class LaunchActivity : AppCompatActivity() {
         binding.root.layoutDirection = android.view.View.LAYOUT_DIRECTION_RTL
         binding.btnNewGame.setOnClickListener { startNewGame() }
         binding.btnLoadSave.setOnClickListener { loadExistingSave() }
+        binding.btnAiSettings.setOnClickListener { startActivity(Intent(this, AISettingsActivity::class.java)) }
     }
 
     private fun startNewGame() {

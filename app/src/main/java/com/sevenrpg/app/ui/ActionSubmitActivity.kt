@@ -6,18 +6,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import com.sevenrpg.app.AIConnectionStore
 import com.sevenrpg.app.GameStateStore
+import com.sevenrpg.app.OpenAICompatibleProvider
 import com.sevenrpg.app.databinding.ActivityActionSubmitBinding
-import com.sevenrpg.domain.DomainModule
 import com.sevenrpg.domain.DomainEvent
 import com.sevenrpg.domain.DomainReducer
 import com.sevenrpg.domain.GameState
 import com.sevenrpg.domain.PlayerCommand
 
-/** Submit a player-controlled action and persist only reducer-accepted state changes. */
+/** Submits the player's intent to a configured real AI provider; validated domain events remain authoritative. */
 class ActionSubmitActivity : AppCompatActivity() {
     private lateinit var binding: ActivityActionSubmitBinding
-    private val aiProvider = DomainModule.createMockProvider()
     private var gameState = GameState.createInitial()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +46,7 @@ class ActionSubmitActivity : AppCompatActivity() {
     private fun executeAction() {
         val actionText = binding.etAction.text.toString().trim()
         if (actionText.isBlank() || actionText.length > 200) return
+
         val player = gameState.player
         val scene = gameState.scene
         val world = gameState.world
@@ -54,54 +55,108 @@ class ActionSubmitActivity : AppCompatActivity() {
             return
         }
 
+        val config = AIConnectionStore.load(this)
+        if (config == null) {
+            Toast.makeText(this, "اضبط اتصال AI ومفتاح API قبل تنفيذ الأفعال.", Toast.LENGTH_LONG).show()
+            startActivity(Intent(this, AISettingsActivity::class.java))
+            return
+        }
+
+        val stateSnapshot = gameState
+        val command = PlayerCommand.create(
+            playerId = player.playerId,
+            sceneId = scene.sceneId,
+            action = actionText,
+            revisionBase = stateSnapshot.revision
+        )
+        val commandValidation = DomainReducer.validateCommand(command, stateSnapshot)
+        if (!commandValidation.isValid) {
+            Toast.makeText(this, commandValidation.errors.firstOrNull() ?: "خطأ في التحقق", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val context = mapOf<String, Any>(
+            "worldId" to world.worldId,
+            "worldName" to world.name,
+            "worldCanonFacts" to world.canonFacts,
+            "playerId" to player.playerId,
+            "playerName" to player.name,
+            "characterClass" to (player.identitySheet["class"] ?: "unknown"),
+            "characterAttributes" to player.attributes,
+            "sceneId" to scene.sceneId,
+            "gameCanonFacts" to stateSnapshot.canonFacts,
+            "characterKnowledge" to stateSnapshot.characterKnowledge,
+            "characterBeliefs" to stateSnapshot.characterBeliefs,
+            "stateRevision" to stateSnapshot.revision
+        )
+
         binding.btnExecute.isEnabled = false
         binding.btnCancel.isEnabled = false
-        binding.root.postDelayed({
-            val command = PlayerCommand.create(
-                playerId = player.playerId,
-                sceneId = scene.sceneId,
-                action = actionText,
-                revisionBase = gameState.revision
-            )
-            val commandValidation = DomainReducer.validateCommand(command, gameState)
-            if (!commandValidation.isValid) {
-                Toast.makeText(this, commandValidation.errors.firstOrNull() ?: "خطأ في التحقق", Toast.LENGTH_LONG).show()
-                restoreButtons()
-                return@postDelayed
-            }
+        binding.responseText.text = "جارٍ الاتصال بنموذج الذكاء الاصطناعي…"
+        binding.responseCard.visibility = View.VISIBLE
 
-            val context = mapOf(
-                "worldId" to world.worldId,
-                "playerId" to player.playerId,
-                "sceneId" to scene.sceneId
-            )
-            val proposal = aiProvider.generateNarrative(actionText, context, gameState.revision)
-            val proposalValidation = DomainReducer.validateProposal(proposal.toMap(), gameState)
-            if (!proposalValidation.isValid) {
-                Toast.makeText(this, proposalValidation.errors.firstOrNull() ?: "خطأ في التحقق من الاقتراح", Toast.LENGTH_LONG).show()
-                restoreButtons()
-                return@postDelayed
+        Thread {
+            val result = runCatching {
+                OpenAICompatibleProvider(config).generateNarrative(actionText, context, stateSnapshot.revision)
             }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                result.fold(
+                    onSuccess = { proposal ->
+                        val proposalValidation = DomainReducer.validateProposal(proposal.toMap(), stateSnapshot)
+                        if (!proposalValidation.isValid) {
+                            showFailure(proposalValidation.errors.firstOrNull() ?: "رفض مدقق الحالة اقتراح AI.")
+                            return@fold
+                        }
 
-            for (eventData in proposal.events) {
-                @Suppress("UNCHECKED_CAST")
-                val event = DomainEvent.fromMap(eventData as Map<String, Any>)
-                val (newState, accepted) = DomainReducer.applyEvent(gameState, event)
-                if (accepted) gameState = newState
-            }
+                        var nextState = stateSnapshot
+                        var acceptedEvents = 0
+                        for (eventData in proposal.events) {
+                            val event = runCatching {
+                                @Suppress("UNCHECKED_CAST")
+                                DomainEvent.fromMap(eventData as Map<String, Any>)
+                            }.getOrElse {
+                                showFailure("عاد النموذج بحدث غير صالح؛ لم تُغيّر الحملة.")
+                                return@fold
+                            }
+                            val (candidate, accepted) = DomainReducer.applyEvent(nextState, event)
+                            if (!accepted) {
+                                showFailure("رفض محرك القواعد الحدث؛ لم تُغيّر الحملة.")
+                                return@fold
+                            }
+                            nextState = candidate
+                            acceptedEvents++
+                        }
 
-            if (!GameStateStore.save(this, gameState)) {
-                Toast.makeText(this, "تعذّر تثبيت الحالة الجديدة على الجهاز.", Toast.LENGTH_LONG).show()
+                        if (acceptedEvents == 0) {
+                            showFailure("لم ينتج النموذج حدثاً صالحاً؛ لم تُغيّر الحملة.")
+                            return@fold
+                        }
+                        if (!GameStateStore.save(this, nextState)) {
+                            showFailure("تعذّر تثبيت نتيجة الفعل في الحفظ الدائم.")
+                            return@fold
+                        }
+                        gameState = nextState
+                        binding.responseText.text = proposal.prose
+                        binding.responseCard.visibility = View.VISIBLE
+                        restoreButtons()
+                    },
+                    onFailure = { error ->
+                        showFailure("فشل اتصال AI: ${error.message?.take(240) ?: "خطأ غير معروف"}. تحقق من الشبكة والرابط والمفتاح ورصيد المزود.")
+                    }
+                )
             }
-            binding.responseText.text = proposal.prose
-            binding.responseCard.visibility = View.VISIBLE
-            binding.responseCard.scrollTo(0, 0)
-            restoreButtons()
-        }, 250)
+        }.start()
+    }
+
+    private fun showFailure(message: String) {
+        binding.responseText.text = message
+        binding.responseCard.visibility = View.VISIBLE
+        restoreButtons()
     }
 
     private fun restoreButtons() {
-        binding.btnExecute.isEnabled = true
+        binding.btnExecute.isEnabled = binding.etAction.text.toString().trim().length in 1..200
         binding.btnCancel.isEnabled = true
     }
 }

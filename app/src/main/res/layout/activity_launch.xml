@@ -59,4 +59,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/btn_ai_settings"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_h_md"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="إعداد اتصال الذكاء الاصطناعي"
+        android:textSize="@dimen/text_base"
+        android:backgroundTint="@android:color/transparent"
+        android:textColor="@color/primary_600"
+        android:minHeight="@dimen/min_touch"
+        app:layout_constraintTop_toBottomOf="@id/btn_load_save"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
