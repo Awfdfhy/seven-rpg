@@ -62,9 +62,13 @@ class SceneEntryActivity : AppCompatActivity() {
     private fun renderNarrative() {
         val worldName = gameState.world?.name ?: "العالم المجهول"
         val playerName = gameState.player?.name ?: "المسافر"
-        binding.narrativeText.text =
+        val latestAiNarrative = gameState.events.lastOrNull()
+            ?.payload?.get("description") as? String
+        val opening = latestAiNarrative?.takeIf { it.isNotBlank() } ?: (
             "أنت ${playerName} في عالم «${worldName}». تستيقظ عند أطراف غابة قديمة، " +
             "وتتشعب أمامك طرق تؤدي إلى مدينة مضاءة وكهف غامض ونهر هادئ. " +
-            "اختر فعلك التالي لتتابع المغامرة.\n\nتقدم الحملة: ${gameState.revision}"
+            "اختر فعلك التالي لتتابع المغامرة."
+        )
+        binding.narrativeText.text = "${opening}\n\nتقدم الحملة: ${gameState.revision}"
     }
 }
