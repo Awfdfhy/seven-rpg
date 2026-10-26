@@ -365,3 +365,37 @@ test('achievement and journal history are recorded and persisted after a quest',
   expect(saved.systems.achievements.entries.some(a => a.id === 'quest-complete')).toBe(true);
   expect(saved.systems.journal.entries.length).toBeGreaterThanOrEqual(3);
 });
+
+
+test('character memory keeps knowledge, beliefs and rumors in separate buckets with provenance', async ({ page }) => {
+  await createCampaign(page, 'عالم الذاكرة', 'راوية');
+  await page.getByLabel('نوع الذاكرة').selectOption('rumors');
+  await page.getByLabel('المحتوى').fill('يقال إن البرج يختفي عند الفجر.');
+  await page.getByLabel('المصدر / صاحب المعلومة').fill('تاجر مسافر');
+  await page.getByRole('button', { name: 'حفظ في ذاكرة الشخصية' }).click();
+  await expect(page.locator('#memoryList')).toContainText('شائعات: 1');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.memory.rumors[0].text).toContain('البرج');
+  expect(saved.systems.memory.rumors[0].source).toBe('تاجر مسافر');
+  expect(saved.systems.memory.knowledge).toHaveLength(0);
+  expect(saved.systems.memory.beliefs).toHaveLength(0);
+  await page.reload();
+  await expect(page.locator('#memoryList')).toContainText('شائعات: 1');
+});
+
+test('failed storage during a shop purchase rolls back gold and inventory', async ({ page }) => {
+  await createCampaign(page, 'عالم المعاملات', 'تاجر');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'seven_rpg_browser_save_v1') throw new DOMException('storage full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: 'شراء جرعة علاج — 10 ذهب' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('فشل الحفظ المحلي');
+  const saved = await page.evaluate(() => JSON.parse(Storage.prototype.getItem.call(localStorage, 'seven_rpg_browser_save_v1')));
+  expect(saved.systems.stats.gold).toBe(25);
+  expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(2);
+  await expect(page.locator('#statsPanel')).toContainText('الذهب 25');
+});
