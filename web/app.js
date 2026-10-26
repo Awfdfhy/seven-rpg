@@ -56,7 +56,7 @@ function systemEvent(action,description){
   state=ensureSystems(state);
   state.events.push({id:'evt_'+base+'_'+crypto.randomUUID(),type:'gameplay',revisionBase:base,authorized:true,action,description,at:new Date().toISOString()});
   state.systems.journal.entries.push({id:'journal_'+base,action,description,at:new Date().toISOString(),location:state.systems.location});
-  const achievements=[['first-event','خطوتك الأولى',state.events.length>=1],['first-victory','أول انتصار',action==='هجوم'&&description.includes('انتصرت')],['quest-complete','صائد المهام',action==='إكمال مهمة'],['explorer','رحّالة',state.systems.map.visited.length>=4]];
+  const achievements=[['first-event','خطوتك الأولى',state.events.length>=1],['first-victory','أول انتصار',['هجوم','استخدام مهارة'].includes(action)&&description.includes('انتصرت')],['quest-complete','صائد المهام',action==='إكمال مهمة'],['explorer','رحّالة',state.systems.map.visited.length>=4]];
   for(const [id,title,earned] of achievements)if(earned&&!state.systems.achievements.entries.some(a=>a.id===id))state.systems.achievements.entries.push({id,title,at:new Date().toISOString()});
   state.revision++;state.narrative=description;
   if(!persist()){state=lastSavedState?JSON.parse(JSON.stringify(lastSavedState)):previous;render();return false}
