@@ -52,6 +52,18 @@ button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);bor
   <div class="item"><h3>🏰 الفصائل</h3><div id="factionList"></div></div>
 </div>
 <div class="item"><h3>🗺️ الخريطة والسفر</h3><p>اختر موقعًا لاستكشافه. السفر ممنوع أثناء القتال.</p><div id="locationList" class="actions"></div></div>
+<div class="row">
+  <div class="item"><h3>✨ المهارات</h3><p id="equipmentInfo" class="muted"></p><div id="skillList"></div></div>
+  <div class="item"><h3>🛒 المتجر والحِرفة</h3><div id="shopList"></div></div>
+</div>
+<div class="item"><h3>🏆 الإنجازات</h3><div id="achievementList"></div></div>
+<div class="item"><h3>📖 سجل الأحداث</h3><div id="journalList"></div></div>
+<div class="item"><h3>📜 قانون العالم (Canon)</h3><p>الحقائق هنا يضيفها اللاعب فقط؛ لا يغيّرها AI تلقائياً.</p>
+<label for="canonKey">عنوان الحقيقة</label><input id="canonKey" maxlength="60" placeholder="مثال: عهد السحر">
+<label for="canonValue">الحقيقة</label><textarea id="canonValue" maxlength="300" placeholder="حقيقة ثابتة في هذا العالم"></textarea>
+<button id="canonAddBtn">إضافة حقيقة قانونية</button><div id="canonList"></div>
+</div>
+<div class="item"><h3>🧠 الذاكرة حسب النوع</h3><p>الفصل بين المعرفة والمعتقدات والشائعات والملخصات يمنع التعامل مع الشائعة كحقيقة مؤكدة.</p><div id="memoryList"></div></div>
 </section>
 <section class="panel" id="aiPanel">
 <h2>✧ اتصال الذكاء الاصطناعي</h2><p>يدعم واجهة OpenAI-compatible. أدخل عنوان Chat Completions واسم النموذج ومفتاحك.</p>
