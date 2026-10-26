@@ -1,23 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <font-family name="rakkas">
-        <font
-            android:fontStyle="normal"
-            android:fontWeight="400"
-            android:font="@font/rakkas_regular" />
-    </font-family>
-    <font-family name="tajawal">
-        <font
-            android:fontStyle="normal"
-            android:fontWeight="400"
-            android:font="@font/tajawal_regular" />
-        <font
-            android:fontStyle="normal"
-            android:fontWeight="500"
-            android:font="@font/tajawal_medium" />
-        <font
-            android:fontStyle="normal"
-            android:fontWeight="700"
-            android:font="@font/tajawal_bold" />
-    </font-family>
-</resources>
+<resources />
