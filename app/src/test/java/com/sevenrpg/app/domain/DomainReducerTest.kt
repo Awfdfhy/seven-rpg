@@ -97,6 +97,7 @@ class DomainReducerTest {
     fun `validate proposal unauthorized mutation should be invalid`() {
         val state = GameState.createInitial()
         val proposal = mapOf(
+            "type" to "test_proposal",
             "attemptsUnauthorizedMutation" to true,
             "events" to emptyList<Map<String, Any>>(),
             "revisionBase" to 1
@@ -110,6 +111,7 @@ class DomainReducerTest {
     fun `validate proposal stale revision should be invalid`() {
         val state = GameState.createInitial().copy(revision = 5)
         val proposal = mapOf(
+            "type" to "test_proposal",
             "revisionBase" to 3,
             "events" to emptyList<Map<String, Any>>(),
             "attemptsUnauthorizedMutation" to false
@@ -123,6 +125,7 @@ class DomainReducerTest {
     fun `validate proposal duplicate event ids should be invalid`() {
         val state = GameState.createInitial()
         val proposal = mapOf(
+            "type" to "test_proposal",
             "revisionBase" to 1,
             "events" to listOf(
                 mapOf("eventId" to "evt_1", "type" to "test"),
@@ -139,6 +142,7 @@ class DomainReducerTest {
     fun `validate proposal valid should pass`() {
         val state = GameState.createInitial()
         val proposal = mapOf(
+            "type" to "test_proposal",
             "revisionBase" to 1,
             "events" to listOf(mapOf("eventId" to "evt_1", "type" to "narrative_advance", "authorized" to true)),
             "attemptsUnauthorizedMutation" to false
