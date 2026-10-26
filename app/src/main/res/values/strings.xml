@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Seven RPG</string>
+    <string name="new_game">بدء لعبة جديدة</string>
+    <string name="load_save">تحميل حفظ</string>
+    <string name="create_world">إنشاء العالم</string>
+    <string name="cancel">إلغاء</string>
+    <string name="world_name_hint">أدخل اسم العالم…</string>
+    <string name="world_name_required">اسم العالم مطلوب</string>
+    <string name="world_name_too_long">اسم العالم طويل جداً (أقصى 30 حرف)</string>
+    <string name="character_name">اسم الشخصية</string>
+    <string name="character_name_required">اسم الشخصية مطلوب</string>
+    <string name="character_name_too_long">اسم الشخصية طويل جداً (أقصى 20 حرف)</string>
+    <string name="class_label">الفئة</string>
+    <string name="warrior">محارب</string>
+    <string name="mage">ساحر</string>
+    <string name="rogue">لص</string>
+    <string name="create_character">إنشاء الشخصية</string>
+    <string name="scene_title">المشهد</string>
+    <string name="back_to_world">العودة للعالم</string>
+    <string name="submit_action">إجراء إجراء</string>
+    <string name="action_hint">اكتب إجراءك هنا… (مثل: استكشف الغابة، تحدث إلى الحارس، افتح الصندوق)</string>
+    <string name="action_required">الإجراء مطلوب</string>
+    <string name="action_too_long">الإجراء طويل جداً (أقصى 200 حرف)</string>
+    <string name="execute">تنفيذ</string>
+    <string name="save_title">الحفظ والاستعادة</string>
+    <string name="save_now">حفظ الآن</string>
+    <string name="back_to_game">العودة للعبة</string>
+    <string name="save_success">تم الحفظ بنجاح — يمكن استعادة العالم في أي وقت</string>
+    <string name="save_error">فشل الحفظ — يرجى المحاولة مرة أخرى</string>
+</resources>

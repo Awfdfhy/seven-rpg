@@ -1,0 +1,245 @@
+{
+  "$schema": "https://ui-design-system.schema.org/tokens/v1",
+  "name": "Seven RPG Design Tokens",
+  "version": "1.0.0",
+  "description": "Mobile-first Fantasy RPG design system with Arabic RTL support",
+  "productType": "mobile-rpg-game",
+  "industry": "gaming",
+  "aestheticDirection": "fantasy-quest-premium",
+  "dfiiScore": 14,
+  
+  "colors": {
+    "primary": {
+      "50": "#fdf4ff",
+      "100": "#fae8ff",
+      "200": "#f5d0fe",
+      "300": "#f0abfc",
+      "400": "#e879f9",
+      "500": "#d946ef",
+      "600": "#c026d3",
+      "700": "#a21caf",
+      "800": "#86198f",
+      "900": "#701a75"
+    },
+    "secondary": {
+      "50": "#f0f9ff",
+      "100": "#e0f2fe",
+      "200": "#bae6fd",
+      "300": "#93c5fd",
+      "400": "#60a5fa",
+      "500": "#3b82f6",
+      "600": "#2563eb",
+      "700": "#1d4ed8",
+      "800": "#1e40af",
+      "900": "#1e3a8a"
+    },
+    "neutral": {
+      "50": "#fafafa",
+      "100": "#f5f5f5",
+      "200": "#e5e5e5",
+      "300": "#d4d4d4",
+      "400": "#a3a3a3",
+      "500": "#737373",
+      "600": "#525252",
+      "700": "#404040",
+      "800": "#262626",
+      "900": "#171717"
+    },
+    "semantic": {
+      "success": "#10b981",
+      "warning": "#f59e0b",
+      "error": "#ef4444",
+      "info": "#3b82f6"
+    },
+    "surface": {
+      "glass-light": "rgba(255, 255, 255, 0.75)",
+      "glass-dark": "rgba(17, 17, 17, 0.75)",
+      "panel-light": "#ffffff",
+      "panel-dark": "#171717",
+      "overlay-light": "rgba(0, 0, 0, 0.4)",
+      "overlay-dark": "rgba(255, 255, 255, 0.4)"
+    },
+    "fantasy": {
+      "gold": "#d4af37",
+      "gold-glow": "rgba(212, 175, 55, 0.4)",
+      "emerald": "#10b981",
+      "ruby": "#dc2626",
+      "sapphire": "#2563eb",
+      "amethyst": "#a855f7",
+      "shadow-realm": "#0f172a"
+    }
+  },
+  
+  "typography": {
+    "fontFamily": {
+      "display": ["Rakkas", "Amiri", "serif"],
+      "body": ["Tajawal", "Segoe UI", "system-ui", "sans-serif"],
+      "mono": ["Fira Code", "monospace"]
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem",
+      "5xl": "3rem",
+      "6xl": "4rem"
+    },
+    "fontWeight": {
+      "light": 300,
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "lineHeight": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.75
+    },
+    "letterSpacing": {
+      "tight": "-0.025em",
+      "normal": "0em",
+      "wide": "0.05em"
+    }
+  },
+  
+  "spacing": {
+    "0": "0",
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "10": "2.5rem",
+    "12": "3rem",
+    "16": "4rem",
+    "20": "5rem",
+    "24": "6rem",
+    "section-sm": "3rem",
+    "section-md": "5rem",
+    "section-lg": "8rem"
+  },
+  
+  "sizing": {
+    "container-sm": "640px",
+    "container-md": "768px",
+    "container-lg": "1024px",
+    "button-h-sm": "44px",
+    "button-h-md": "52px",
+    "button-h-lg": "60px",
+    "icon-sm": "16px",
+    "icon-md": "24px",
+    "icon-lg": "32px",
+    "avatar-sm": "32px",
+    "avatar-md": "48px",
+    "avatar-lg": "64px"
+  },
+  
+  "borders": {
+    "radius": {
+      "none": "0",
+      "sm": "4px",
+      "md": "8px",
+      "lg": "12px",
+      "xl": "16px",
+      "full": "9999px"
+    },
+    "width": {
+      "0": "0",
+      "1": "1px",
+      "2": "2px"
+    },
+    "color": {
+      "light": "#e5e5e5",
+      "dark": "#404040",
+      "primary": "#d946ef"
+    }
+  },
+  
+  "shadows": {
+    "none": "none",
+    "sm": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "md": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    "lg": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    "xl": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "fantasy-glow": "0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.15)",
+    "inner": "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)"
+  },
+  
+  "animation": {
+    "duration": {
+      "fast": "150ms",
+      "normal": "300ms",
+      "slow": "500ms"
+    },
+    "easing": {
+      "ease-out": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "ease-in": "cubic-bezier(0.4, 0, 0.6, 1)",
+      "ease-in-out": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+    },
+    "keyframes": {
+      "fade-in": "from { opacity: 0; } to { opacity: 1; }",
+      "slide-up": "from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; }",
+      "pulse-gold": "0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); } 50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }"
+    }
+  },
+  
+  "breakpoints": {
+    "xs": "0",
+    "sm": "480px",
+    "md": "640px",
+    "lg": "768px",
+    "xl": "1024px",
+    "2xl": "1280px"
+  },
+  
+  "zIndex": {
+    "base": 0,
+    "dropdown": 10,
+    "sticky": 20,
+    "fixed": 30,
+    "modal-backdrop": 40,
+    "modal": 50,
+    "popover": 60,
+    "tooltip": 70
+  },
+  
+  "rtl": {
+    "enabled": true,
+    "defaultDirection": "rtl",
+    "supportedLanguages": ["ar", "en"],
+    "mirrorProperties": ["margin-left", "margin-right", "padding-left", "padding-right", "text-align", "float", "left", "right"],
+    "textAlign": {
+      "start": "right",
+      "end": "left"
+    }
+  },
+  
+  "accessibility": {
+    "minContrastRatio": 4.5,
+    "largeTextContrastRatio": 3.0,
+    "minTouchTarget": "44px",
+    "focusRing": "2px solid #d946ef",
+    "focusOffset": "2px",
+    "reduceMotion": true,
+    "screenReaderLabels": true
+  },
+  
+  "antiPatterns": [
+    "emoji-icons",
+    "uneven-icon-sizes",
+    "layout-shift-hover",
+    "invisible-borders-light-mode",
+    "content-behind-fixed-navbar",
+    "mixed-container-widths",
+    "gray-400-body-text"
+  ]
+}

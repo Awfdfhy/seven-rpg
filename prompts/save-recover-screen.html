@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seven RPG — الحفظ والاستعادة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="design-tokens.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      direction: rtl;
+      text-align: right;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-6);
+    }
+
+    /* Header */
+    .screen-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-4);
+      background: var(--color-surface);
+      border-bottom: var(--border-width-1) solid var(--color-border);
+      margin-bottom: var(--space-6);
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--color-primary-600);
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      touch-action: manipulation;
+      min-height: var(--a11y-min-touch);
+    }
+
+    .screen-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      color: var(--color-primary-500);
+      font-weight: var(--font-bold);
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    /* Save status card */
+    .save-card {
+      background: var(--color-surface);
+      border: var(--border-width-1) solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+    }
+
+    .save-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .status-dot.saved {
+      background-color: var(--color-success);
+    }
+
+    .status-dot.error {
+      background-color: var(--color-error);
+    }
+
+    .status-dot.saving {
+      background-color: var(--color-warning);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+    }
+
+    .save-info {
+      font-size: var(--text-xs);
+      color: var(--color-neutral-500);
+      margin-top: var(--space-2);
+      text-align: right;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--size-button-h-md);
+      padding: 0 var(--space-6);
+      border-radius: var(--radius-xl);
+      border: var(--border-width-1) solid transparent;
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out);
+      touch-action: manipulation;
+      min-height: var(--a11y-min-touch);
+    }
+
+    .btn:focus-visible {
+      outline: var(--a11y-focus-ring);
+      outline-offset: var(--a11y-focus-offset);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-500);
+      color: #ffffff;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--color-primary-600);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--color-primary-600);
+      border: var(--border-width-1) solid var(--color-primary-200);
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background-color: var(--color-primary-50);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      background: var(--color-neutral-800);
+      color: #ffffff;
+      padding: var(--space-4) var(--space-6);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: var(--z-tooltip);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .toast.visible {
+      display: block;
+    }
+
+    .toast.success {
+      border-left: var(--border-width-2) solid var(--color-success);
+    }
+
+    .toast.error {
+      border-left: var(--border-width-2) solid var(--color-error);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 375px) {
+      .page-container { padding: var(--space-4); }
+      .save-card { padding: var(--space-4); }
+      .btn-row { flex-direction: column; }
+      .toast { left: var(--space-6); right: var(--space-6); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="screen-header">
+      <button class="btn-back" aria-label="العودة">←</button>
+      <h1 class="screen-title">الحفظ والاستعادة</h1>
+    </header>
+
+    <main class="main-content">
+      <div class="save-card">
+        <div class="save-status">
+          <div class="status-indicator">
+            <div class="status-dot saved" id="status-dot"></div>
+            <span class="status-text" id="status-text">تم الحفظ</span>
+          </div>
+        </div>
+        <div class="save-info" id="save-info">
+          العالم: الغابة المظلمة | الشخصية: البطل | المراجعة: 1 | آخر حفظ: قبل لحظات
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-back-to-game">العودة للعبة</button>
+        <button class="btn btn-primary" id="btn-save-now">حفظ الآن</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast success" id="toast-success">
+    تم الحفظ بنجاح — يمكن استعادة العالم في أي وقت
+  </div>
+  <div class="toast error" id="toast-error">
+    فشل الحفظ — يرجى المحاولة مرة أخرى
+  </div>
+
+  <script>
+    const btnBack = document.getElementById('btn-back-to-game');
+    const btnSave = document.getElementById('btn-save-now');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const toastSuccess = document.getElementById('toast-success');
+    const toastError = document.getElementById('toast-error');
+
+    function showToast(toastElement, duration = 3000) {
+      toastElement.classList.add('visible');
+      setTimeout(() => toastElement.classList.remove('visible'), duration);
+    }
+
+    function setSaving() {
+      statusDot.className = 'status-dot saving';
+      statusText.textContent = 'جاري الحفظ…';
+    }
+
+    function setSaved() {
+      statusDot.className = 'status-dot saved';
+      statusText.textContent = 'تم الحفظ';
+    }
+
+    function setError() {
+      statusDot.className = 'status-dot error';
+      statusText.textContent = 'فشل الحفظ';
+    }
+
+    btnSave.addEventListener('click', async () => {
+      setSaving();
+      btnSave.disabled = true;
+
+      // Simulate atomic save
+      await new Promise(r => setTimeout(r, 1000));
+
+      // Randomly succeed or fail for demo (70% success)
+      const success = Math.random() < 0.7;
+      if (success) {
+        setSaved();
+        showToast(toastSuccess);
+        console.log('[Seven RPG] Save successful');
+      } else {
+        setError();
+        showToast(toastError);
+        console.log('[Seven RPG] Save failed');
+      }
+
+      btnSave.disabled = false;
+    });
+
+    btnBack.addEventListener('click', () => {
+      console.log('[Seven RPG] Back to game');
+      // In real app: navigate to SceneEntry
+    });
+
+    // Keyboard accessibility
+    [btnBack, btnSave].forEach(btn => {
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

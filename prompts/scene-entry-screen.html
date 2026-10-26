@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seven RPG — دخول المشهد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="design-tokens.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      direction: rtl;
+      text-align: right;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-6);
+    }
+
+    /* Header */
+    .screen-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-4);
+      background: var(--color-surface);
+      border-bottom: var(--border-width-1) solid var(--color-border);
+      margin-bottom: var(--space-6);
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--color-primary-600);
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      touch-action: manipulation;
+      min-height: var(--a11y-min-touch);
+    }
+
+    .screen-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      color: var(--color-primary-500);
+      font-weight: var(--font-bold);
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    /* Narrative card */
+    .narrative-card {
+      background: var(--color-surface);
+      border: var(--border-width-1) solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .narrative-label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+      text-align: right;
+    }
+
+    .narrative-text {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--color-text-primary);
+      line-height: var(--leading-relaxed);
+      margin-bottom: var(--space-4);
+      white-space: pre-wrap;
+    }
+
+    .narrative-meta {
+      font-size: var(--text-xs);
+      color: var(--color-neutral-500);
+      margin-top: auto;
+    }
+
+    /* Loading state */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--color-text-secondary);
+    }
+
+    .loading-state .spinner {
+      width: var(--size-icon-lg);
+      height: var(--size-icon-lg);
+      border: var(--border-width-2) solid var(--color-neutral-300);
+      border-top-color: var(--color-primary-500);
+      border-radius: var(--radius-full);
+      animation: spin 0.8s linear infinite;
+      margin-bottom: var(--space-3);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Error state */
+    .error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--color-error);
+    }
+
+    .error-state .error-icon {
+      font-size: var(--text-4xl);
+      margin-bottom: var(--space-3);
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--size-button-h-md);
+      padding: 0 var(--space-6);
+      border-radius: var(--radius-xl);
+      border: var(--border-width-1) solid transparent;
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out);
+      touch-action: manipulation;
+      min-height: var(--a11y-min-touch);
+    }
+
+    .btn:focus-visible {
+      outline: var(--a11y-focus-ring);
+      outline-offset: var(--a11y-focus-offset);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-500);
+      color: #ffffff;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--color-primary-600);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--color-primary-600);
+      border: var(--border-width-1) solid var(--color-primary-200);
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background-color: var(--color-primary-50);
+    }
+
+    /* Responsive */
+    @media (max-width: 375px) {
+      .page-container { padding: var(--space-4); }
+      .narrative-card { padding: var(--space-4); }
+      .btn-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="screen-header">
+      <button class="btn-back" aria-label="العودة">←</button>
+      <h1 class="screen-title">المشهد</h1>
+    </header>
+
+    <main class="main-content">
+      <div class="narrative-card" id="narrative-card">
+        <div class="narrative-label">وصف المشهد</div>
+        <div class="narrative-text" id="narrative-text">
+          تستيقظ في غابة مظلمة. الأشجار المحيطة بك chuchote بأسرار قديمة، والهواء البارد يلامس بشرتك. أمامك ثلاثة طرق: طريق يؤدي إلى مدينة مضيئة في الأفق، وطريق يؤدي إلى كهف غامض، وطريق يؤدي إلى نهر هادئ.
+        </div>
+        <div class="narrative-meta">
+          المشهد: الغابة المظلمة | الوقت: الليل | الحالة: جاهز للإجراء
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-back-to-world">العودة للعالم</button>
+        <button class="btn btn-primary" id="btn-submit-action">إجراء إجراء</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const btnBack = document.getElementById('btn-back-to-world');
+    const btnSubmit = document.getElementById('btn-submit-action');
+
+    btnBack.addEventListener('click', () => {
+      console.log('[Seven RPG] Back to world view');
+      // In real app: navigate to WorldView
+    });
+
+    btnSubmit.addEventListener('click', () => {
+      console.log('[Seven RPG] Submit action — navigate to ActionSubmit');
+      // In real app: navigate to ActionSubmit
+    });
+
+    // Keyboard accessibility
+    [btnBack, btnSubmit].forEach(btn => {
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

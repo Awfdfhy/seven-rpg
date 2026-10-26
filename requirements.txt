@@ -1,0 +1,24 @@
+# Seven RPG — Python Dependencies
+# Directive: Do not introduce a framework or dependency without recording
+# its purpose, maintenance risk, license, size, and alternatives.
+# These are placeholder dependencies — finalize after ADR-0001 stack selection.
+
+# Core agent framework (install after stack selection)
+# langgraph>=0.1.0        # LangGraph state graphs — MIT License
+# langchain-openai>=0.1.0  # OpenAI LLM integration — MIT License
+
+# Testing
+pytest>=8.0.0              # MIT License — unit and contract tests
+pytest-asyncio>=0.23.0     # MIT License — async test support
+
+# Linting and formatting
+ruff>=0.5.0                # MIT License — lint and format
+mypy>=1.10.0               # MIT License — static type checking
+
+# API (optional, after stack selection)
+# fastapi>=0.110.0         # MIT License — web API
+# uvicorn>=0.30.0          # BSD License — ASGI server
+
+# Dev tools
+black>=24.0.0              # MIT License — code formatting
+isort>=5.13.0              # MIT License — import sorting

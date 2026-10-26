@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SevenRPG" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/color_primary_500</item>
+        <item name="colorPrimaryContainer">@color/color_primary_50</item>
+        <item name="colorSecondary">@color/color_fantasy_gold</item>
+        <item name="colorBackground">@color/color_bg</item>
+        <item name="colorSurface">@color/color_surface_panel_light</item>
+    </style>
+</resources>

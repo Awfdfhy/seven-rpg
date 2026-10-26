@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg"
+    android:padding="@dimen/space_6">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/screen_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="إنشاء الشخصية"
+        android:textColor="@color/primary_500"
+        android:textSize="@dimen/text_3xl"
+        android:textStyle="bold"
+        android:fontFamily="@font/rakkas"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/avatar_preview"
+        android:layout_width="@dimen/avatar_lg"
+        android:layout_height="@dimen/avatar_lg"
+        android:layout_marginTop="@dimen/space_6"
+        android:background="@drawable/card_background"
+        android:gravity="center"
+        android:text="شخصية"
+        android:textColor="@color/primary_700"
+        android:textSize="@dimen/text_4xl"
+        android:fontFamily="@font/rakkas"
+        app:layout_constraintTop_toBottomOf="@id/screen_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/character_name_input_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_6"
+        android:layout_marginHorizontal="@dimen/space_4">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_character_name"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_h_md"
+            android:hint="أدخل اسم الشخصية…"
+            android:textSize="@dimen/text_base"
+            android:gravity="end"
+            android:maxLength="20"
+            android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/class_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="الفئة"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_sm"
+        android:textStyle="medium"
+        android:layout_marginTop="@dimen/space_5"
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_marginEnd="@dimen/space_4"
+        android:gravity="end"
+        app:layout_constraintTop_toBottomOf="@id/character_name_input_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/class_options"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_4"
+        app:layout_constraintTop_toBottomOf="@id/class_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/warrior_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_3"
+            android:text="محارب"
+            android:textSize="@dimen/text_sm"
+            android:backgroundTint="@color/primary_100"
+            android:textColor="@color/text_primary"
+            android:minHeight="@dimen/min_touch"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/mage_option" />
+
+        <Button
+            android:id="@+id/mage_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_3"
+            android:text="ساحر"
+            android:textSize="@dimen/text_sm"
+            android:backgroundTint="@color/neutral_50"
+            android:textColor="@color/text_primary"
+            android:minHeight="@dimen/min_touch"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/warrior_option"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/rogue_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="لص"
+            android:textSize="@dimen/text_sm"
+            android:backgroundTint="@color/neutral_50"
+            android:textColor="@color/text_primary"
+            android:minHeight="@dimen/min_touch"
+            app:layout_constraintTop_toBottomOf="@id/warrior_option"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btn_create_character"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_h_md"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_6"
+        android:text="إنشاء الشخصية"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold"
+        android:backgroundTint="@color/primary_500"
+        android:textColor="#ffffff"
+        android:minHeight="@dimen/min_touch"
+        android:enabled="false"
+        app:layout_constraintTop_toBottomOf="@id/class_options"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_h_md"
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="إلغاء"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold"
+        android:backgroundTint="@android:color/transparent"
+        android:textColor="@color/primary_600"
+        android:minHeight="@dimen/min_touch"
+        app:layout_constraintTop_toBottomOf="@id/btn_create_character"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
