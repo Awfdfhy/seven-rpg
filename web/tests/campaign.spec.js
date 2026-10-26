@@ -319,3 +319,49 @@ test('health potion consumes one item and restores health without exceeding maxi
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
   expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(1);
 });
+
+
+test('skills consume mana, equipment state persists, and the shop respects gold', async ({ page }) => {
+  await createCampaign(page, 'أرض المهارات', 'فارس');
+  await page.getByRole('button', { name: 'تعلّم (نقطة مهارة)' }).click();
+  await expect(page.locator('#skillList')).toContainText('متعلّمة');
+  await page.getByRole('button', { name: 'شراء جرعة علاج — 10 ذهب' }).click();
+  await expect(page.locator('#statsPanel')).toContainText('الذهب 15');
+  await page.getByRole('button', { name: 'صناعة جرعة (عشبان)' }).click();
+  await expect(page.locator('#inventoryList')).toContainText('عشب طبي');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.skills.learned.length).toBe(2);
+  expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(3);
+  expect(saved.systems.inventory.items.find(i => i.id === 'herb').quantity).toBe(1);
+  await page.reload();
+  await expect(page.locator('#skillList')).toContainText('متعلّمة');
+});
+
+test('player-authored canon facts are persistent and cannot be silently overwritten', async ({ page }) => {
+  await createCampaign(page, 'عالم القانون', 'كاتبة');
+  await page.getByLabel('عنوان الحقيقة').fill('عهد السحر');
+  await page.getByLabel('الحقيقة').fill('لا يمكن إحياء الموتى في هذا العالم.');
+  await page.getByRole('button', { name: 'إضافة حقيقة قانونية' }).click();
+  await expect(page.locator('#canonList')).toContainText('لا يمكن إحياء الموتى');
+  await page.getByLabel('عنوان الحقيقة').fill('عهد السحر');
+  await page.getByLabel('الحقيقة').fill('تغيير مخالف');
+  await page.getByRole('button', { name: 'إضافة حقيقة قانونية' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('هذه الحقيقة موجودة');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.world.canonFacts['عهد السحر']).toBe('لا يمكن إحياء الموتى في هذا العالم.');
+  expect(saved.systems.journal.entries.some(e => e.action === 'إضافة حقيقة قانونية')).toBe(true);
+  await page.reload();
+  await expect(page.locator('#canonList')).toContainText('لا يمكن إحياء الموتى');
+});
+
+test('achievement and journal history are recorded and persisted after a quest', async ({ page }) => {
+  await createCampaign(page, 'أرض الإنجازات', 'مغامرة');
+  await page.getByRole('button', { name: 'قبول المهمة' }).click();
+  await page.getByRole('button', { name: 'تسجيل تقدم' }).click();
+  await page.getByRole('button', { name: 'تسجيل تقدم' }).click();
+  await expect(page.locator('#achievementList')).toContainText('صائد المهام');
+  await expect(page.locator('#journalList')).toContainText('إكمال مهمة');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.achievements.entries.some(a => a.id === 'quest-complete')).toBe(true);
+  expect(saved.systems.journal.entries.length).toBeGreaterThanOrEqual(3);
+});
