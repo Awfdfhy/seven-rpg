@@ -22,7 +22,7 @@
         android:textColor="@color/primary_500"
         android:textSize="@dimen/text_6xl"
         android:textStyle="bold"
-        android:fontFamily="@font/rakkas"
+        android:fontFamily="serif"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
