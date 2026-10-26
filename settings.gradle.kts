@@ -14,4 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-include(":app")
+rootProject.name = "sevenrpg"
+
+include(":app", ":domain")
