@@ -122,10 +122,12 @@ data class SkillTree(
 
     companion object {
         fun fromMap(data: Map<String, Any>): SkillTree = SkillTree(
-            skills = (data["skills"] as? Map<*, *>)
-                ?.mapValues { it.value as Map<String, Any> }
-                ?.mapValues { Skill.fromMap(it) }
-                ?: emptyMap()
+            skills = (data["skills"] as? Map<*, *>)?.entries
+                ?.mapNotNull { entry ->
+                    val key = entry.key as? String ?: return@mapNotNull null
+                    val value = entry.value as? Map<String, Any> ?: return@mapNotNull null
+                    key to Skill.fromMap(value)
+                }?.toMap() ?: emptyMap()
         )
     }
 }
