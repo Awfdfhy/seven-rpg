@@ -31,7 +31,7 @@ class MockAIProvider(private val seed: String = "mock-default") : AIProvider {
             "المخزون يتغير بعد تنفيذ الإجراء.",
             "علاقات الشخصيات تتطور استجابةً لقرارك."
         )
-        val prose = proseTemplates[narrativeSeed.absoluteValue % proseTemplates.size].replace("{goal}", goal.take(50))
+        val prose = proseTemplates[Math.floorMod(narrativeSeed, proseTemplates.size)].replace("{goal}", goal.take(50))
 
         // Deterministic event proposal
         val eventId = "evt_${revision}_${callCount}_${Integer.toHexString(goal.hashCode())}"
