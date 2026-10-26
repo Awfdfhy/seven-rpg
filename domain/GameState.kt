@@ -26,6 +26,11 @@ data class GameState(
             "events" to events.map { it.toMap() },
             "revision" to revision,
             "canonFacts" to canonFacts,
+            "confirmedEventLog" to confirmedEventLog.map { it.toMap() },
+            "characterKnowledge" to characterKnowledge,
+            "characterBeliefs" to characterBeliefs,
+            "rumors" to rumors,
+            "summaries" to summaries,
             "campaignSettings" to campaignSettings?.toMap()
         )
     }
@@ -41,6 +46,18 @@ data class GameState(
                     ?: emptyList(),
                 revision = data["revision"] as? Int ?: 1,
                 canonFacts = data["canonFacts"] as? Map<String, Any> ?: emptyMap(),
+                confirmedEventLog = (data["confirmedEventLog"] as? List<*>)
+                    ?.mapNotNull { it as? Map<String, Any> }
+                    ?.map { DomainEvent.fromMap(it) }
+                    ?: emptyList(),
+                characterKnowledge = data["characterKnowledge"] as? Map<String, Any> ?: emptyMap(),
+                characterBeliefs = data["characterBeliefs"] as? Map<String, Any> ?: emptyMap(),
+                rumors = (data["rumors"] as? List<*>)
+                    ?.mapNotNull { it as? Map<String, Any> }
+                    ?: emptyList(),
+                summaries = (data["summaries"] as? List<*>)
+                    ?.mapNotNull { it as? Map<String, Any> }
+                    ?: emptyList(),
                 campaignSettings = data["campaignSettings"]?.let { CampaignSettings.fromMap(it as Map<String, Any>) }
             )
         }
