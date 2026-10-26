@@ -102,7 +102,7 @@ function addMemoryEntry(){
   if(!state)return;const type=$('memoryType').value,textValue=$('memoryText').value.trim(),source=$('memorySource').value.trim()||'اللاعب';
   if(!textValue||textValue.length>1000){status('gameStatus','أدخل نص ذاكرة من 1 إلى 1000 حرف.','error');return}
   if(!['knowledge','beliefs','rumors','summaries'].includes(type))return;
-  const previous=JSON.parse(JSON.stringify(state));state.systems.memory[type].push({text:textValue,source:source.slice(0,100),confidence:type==='knowledge'?1:type==='rumors'?.35:.65,at:new Date().toISOString(),worldId:state.world.id,characterId:state.player.id});
+  const previous=JSON.parse(JSON.stringify(state));state.systems.memory[type].push({text:textValue,source:source.slice(0,100),confidence:type==='knowledge'?1:type==='rumors' ? 0.35 : 0.65,at:new Date().toISOString(),worldId:state.world.id,characterId:state.player.id});
   if(!systemEvent('إضافة ذاكرة',({knowledge:'سُجلت معرفة مؤكدة للشخصية.',beliefs:'سُجل اعتقاد غير مؤكد للشخصية.',rumors:'سُجلت شائعة غير مؤكدة.',summaries:'سُجل ملخص ذو مصدر.'})[type])){state=previous;return}
   $('memoryText').value='';$('memorySource').value='';
 }
