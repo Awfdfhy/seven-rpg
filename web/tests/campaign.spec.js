@@ -248,3 +248,74 @@ test('failed local persistence rolls back a successful-looking AI result', async
   expect(saved.events).toHaveLength(0);
   await expect(page.locator('#narrative')).not.toContainText('رد تجريبي لا يجب تثبيته');
 });
+
+
+test('RPG systems render and persist combat, rewards, inventory and character progression', async ({ page }) => {
+  await createCampaign(page, 'مملكة الأنظمة', 'رائد');
+  await expect(page.locator('#systemsPanel')).toBeVisible();
+  await expect(page.locator('#combatPanel')).toContainText('لا يوجد قتال نشط');
+  await expect(page.locator('#inventoryList')).toContainText('جرعة علاج');
+  await page.getByRole('button', { name: 'استكشف / ابحث عن خصم' }).click();
+  await expect(page.locator('#combatPanel')).toContainText('ذئب الرماد');
+  await page.getByRole('button', { name: 'هجوم' }).click();
+  await page.getByRole('button', { name: 'هجوم' }).click();
+  await page.getByRole('button', { name: 'هجوم' }).click();
+  await expect(page.locator('#combatPanel')).toContainText('لا يوجد قتال نشط');
+  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.stats.xp).toBeGreaterThan(0);
+  expect(saved.systems.stats.gold).toBeGreaterThan(25);
+  expect(saved.systems.combat.active).toBe(false);
+  await page.reload();
+  await expect(page.locator('#systemsPanel')).toBeVisible();
+  saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.stats.xp).toBeGreaterThan(0);
+});
+
+test('quest lifecycle grants rewards and survives reload', async ({ page }) => {
+  await createCampaign(page, 'أرض المهمات', 'نورا');
+  await page.getByRole('button', { name: 'قبول المهمة' }).click();
+  await expect(page.locator('#questList')).toContainText('active');
+  await page.getByRole('button', { name: 'تسجيل تقدم' }).click();
+  await page.getByRole('button', { name: 'تسجيل تقدم' }).click();
+  await expect(page.locator('#questList')).toContainText('completed');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.quests.entries[0].status).toBe('completed');
+  expect(saved.systems.stats.xp).toBeGreaterThanOrEqual(35);
+  expect(saved.systems.stats.gold).toBeGreaterThanOrEqual(45);
+  await page.reload();
+  await expect(page.locator('#questList')).toContainText('completed');
+});
+
+test('relations, faction reputation, travel and inventory use mutate and persist their own systems', async ({ page }) => {
+  await createCampaign(page, 'ممالك الروابط', 'سلمى');
+  await page.getByRole('button', { name: 'ساعده (+5)' }).first().click();
+  await expect(page.locator('#relationList')).toContainText('العلاقة: 5');
+  await page.getByRole('button', { name: 'خدمة الفصيل (+10)' }).first().click();
+  await expect(page.locator('#factionList')).toContainText('السمعة: 10');
+  await page.getByRole('button', { name: /الغابة الموشّحة/ }).click();
+  await expect(page.locator('#statsPanel')).toContainText('الغابة الموشّحة');
+  await page.getByRole('button', { name: 'استكشف / ابحث عن خصم' }).click();
+  await expect(page.locator('#combatPanel')).toContainText('خصم:');
+  await page.getByRole('button', { name: 'الغابة الموشّحة' }).click();
+  await expect(page.locator('#gameStatus')).toContainText('لا يمكنك السفر أثناء القتال');
+  await page.getByRole('button', { name: 'انسحاب' }).click();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.relations.entries[0].score).toBe(5);
+  expect(saved.systems.factions.entries[0].reputation).toBe(10);
+  expect(saved.systems.map.visited).toContain('الغابة الموشّحة');
+  await page.reload();
+  await expect(page.locator('#relationList')).toContainText('العلاقة: 5');
+  await expect(page.locator('#factionList')).toContainText('السمعة: 10');
+});
+
+test('health potion consumes one item and restores health without exceeding maximum', async ({ page }) => {
+  await createCampaign(page, 'عالم الجرعات', 'حكيم');
+  await page.getByRole('button', { name: 'استكشف / ابحث عن خصم' }).click();
+  await page.getByRole('button', { name: 'هجوم' }).click();
+  await expect(page.locator('#statsPanel')).toContainText('الصحة 92/100');
+  await page.getByRole('button', { name: 'استخدم جرعة العلاج' }).click();
+  await expect(page.locator('#statsPanel')).toContainText('الصحة 100/100');
+  await expect(page.locator('#inventoryList')).toContainText('×1');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('seven_rpg_browser_save_v1')));
+  expect(saved.systems.inventory.items.find(i => i.id === 'potion-health').quantity).toBe(1);
+});
