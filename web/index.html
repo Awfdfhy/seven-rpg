@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100f19">
+<meta name="description" content="Seven RPG — مغامرتك، عالمك، وقراراتك.">
+<title>Seven RPG</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{color-scheme:dark;--bg:#100f19;--panel:#191725;--panel2:#211d30;--line:#39324d;--gold:#d8b46a;--text:#f4f0fa;--muted:#b8afc9;--red:#cf7582;--green:#7fc8a2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#28203a 0,#100f19 55%);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+header{padding:22px max(18px,calc((100vw - 900px)/2));border-bottom:1px solid #ffffff12;background:#100f19bb;position:sticky;top:0;backdrop-filter:blur(12px);z-index:2}
+.brand{display:flex;align-items:center;gap:12px}.sigil{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:22px;box-shadow:0 0 28px #d8b46a22}h1{font-size:1.15rem;margin:0;letter-spacing:.08em}.tag{color:var(--muted);font-size:.8rem}
+main{max-width:900px;margin:auto;padding:22px 16px 50px}.panel{background:linear-gradient(145deg,#211d30ee,#171522ee);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 12px 38px #0002}
+h2{font-size:1.1rem;margin:0 0 14px;color:var(--gold)}p{margin:8px 0;color:var(--muted)}label{display:block;color:var(--muted);font-size:.9rem;margin:12px 0 5px}input,textarea,select{width:100%;background:#100f19;border:1px solid #49405d;color:var(--text);padding:12px;border-radius:10px;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--gold)}textarea{min-height:95px;resize:vertical}
+button,.filebutton{font:inherit;font-weight:650;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel2);color:var(--text);cursor:pointer}button.primary{background:linear-gradient(120deg,#9e7634,#d8b46a);color:#17111d;border-color:#d8b46a}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hidden{display:none!important}.status{padding:10px 12px;border-radius:9px;background:#100f19;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}.status.ok{color:var(--green)}.status.error{color:var(--red)}.narrative{font-size:1.04rem;line-height:1.95;color:#f3edf9;white-space:pre-wrap}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:3px 9px;font-size:.8rem;color:var(--muted);margin-inline-start:6px}.muted{color:var(--muted)}.danger{color:var(--red)}footer{text-align:center;color:var(--muted);font-size:.8rem;padding:15px}
+@media(max-width:600px){.row{grid-template-columns:1fr}.panel{padding:15px}header{padding:15px 16px}.actions button,.actions .filebutton{flex:1 1 auto}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="sigil">✦ 7</div><div><h1>SEVEN RPG</h1><div class="tag">العالم لك. القرار لك.</div></div><span class="pill" id="revisionPill">لا توجد حملة</span></div></header>
+<main>
+<section class="panel" id="setupPanel">
+<h2>✧ بداية الحكاية</h2><p>أنشئ عالمك وشخصيتك. تُحفظ الحملة تلقائياً على هذا المتصفح.</p>
+<label for="worldName">اسم العالم</label><input id="worldName" maxlength="30" placeholder="مثال: ممالك الرماد">
+<label for="worldLore">قانون العالم / خلفيته</label><textarea id="worldLore" maxlength="1500" placeholder="السحر، الفصائل، التاريخ، وما لا يجوز تغييره..."></textarea>
+<label for="playerName">اسم الشخصية</label><input id="playerName" maxlength="20" placeholder="اسم بطلك">
+<div class="row"><div><label for="className">الفئة</label><select id="className"><option value="warrior">محارب</option><option value="mage">ساحر</option><option value="rogue">لص</option></select></div><div><label for="difficulty">الصعوبة</label><select id="difficulty"><option>متوسطة</option><option>سهلة</option><option>صعبة</option></select></div></div>
+<div class="actions"><button class="primary" id="startBtn">إنشاء / بدء الحملة</button><button id="resumeBtn">استعادة الحفظ</button></div>
+<div class="status" id="setupStatus" role="status">لا توجد حملة محفوظة بعد.</div>
+</section>
+<section class="panel hidden" id="gamePanel">
+<h2>✧ سجل المغامرة <span class="pill" id="worldPill"></span></h2>
+<div class="muted" id="characterInfo"></div>
+<div class="narrative" id="narrative" aria-live="polite">ابدأ مغامرتك.</div>
+<label for="actionInput">ما الذي تريد فعله؟</label><textarea id="actionInput" maxlength="200" placeholder="اكتب فعلك بنفسك — لا يتخذ الذكاء الاصطناعي القرار نيابةً عنك."></textarea>
+<div class="actions"><button class="primary" id="actBtn">نفّذ الفعل عبر AI</button><button id="saveBtn">حفظ الآن</button><button id="newBtn">عالم جديد</button></div>
+<div class="status" id="gameStatus" role="status">الحفظ التلقائي مفعّل.</div>
+<div class="actions"><button id="exportBtn">تصدير الحفظ JSON</button><label class="filebutton">استيراد حفظ JSON<input id="importInput" type="file" accept="application/json,.json" hidden></label></div>
+</section>
+<section class="panel" id="aiPanel">
+<h2>✧ اتصال الذكاء الاصطناعي</h2><p>يدعم واجهة OpenAI-compatible. أدخل عنوان Chat Completions واسم النموذج ومفتاحك.</p>
+<label for="endpoint">عنوان API الكامل</label><input id="endpoint" type="url" value="https://openrouter.ai/api/v1/chat/completions" autocomplete="url">
+<label for="model">اسم النموذج</label><input id="model" value="openai/gpt-4.1-mini" autocomplete="off">
+<label for="apiKey">مفتاح API — يبقى في ذاكرة الجلسة فقط</label><input id="apiKey" type="password" autocomplete="off" placeholder="أدخل المفتاح ولا تشاركه">
+<p class="danger">تنبيه أمني: المتصفح لا يملك مخزناً سرياً مثل Android Keystore. لا يُحفظ المفتاح في localStorage؛ سيُطلب مجدداً بعد إغلاق الجلسة. قد يتطلب مزودك السماح بطلبات CORS.</p>
+<div class="actions"><button id="saveAiBtn">حفظ إعدادات غير سرية</button><button id="testAiBtn">اختبار اتصال حقيقي</button></div>
+<div class="status" id="aiStatus" role="status">لم يُختبر الاتصال بعد.</div>
+</section>
+</main>
+<footer>Seven RPG · نسخة متصفح تجريبية · بيانات الحملة محلية على هذا الجهاز</footer>
+<script src="./app.js"></script>
+</body></html>
